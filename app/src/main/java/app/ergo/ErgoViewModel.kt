@@ -12,6 +12,7 @@ import app.ergo.data.Analysis
 import app.ergo.data.CHECK
 import app.ergo.data.CUR_LESSON
 import app.ergo.data.ChatMessage
+import app.ergo.data.ChatResult
 import app.ergo.data.DRILLS
 import app.ergo.data.Drill
 import app.ergo.data.FALLACIES
@@ -32,11 +33,14 @@ import app.ergo.data.Topic
 import app.ergo.data.demoFlag
 import app.ergo.data.fmtCost
 import app.ergo.data.parseModelJson
+import app.ergo.data.str
 import app.ergo.data.stringList
 import app.ergo.data.sysSpar
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.json.JSONException
+import org.json.JSONObject
 
 enum class Screen { Onboarding, App }
 enum class Tab { Learn, Drill, Analyze, Spar, You }
@@ -227,13 +231,43 @@ class ErgoViewModel(app: Application) : AndroidViewModel(app) {
         get() = if (model == AUTO_MODEL) "Автовыбор"
         else (models.find { it.id == model } ?: FALLBACK_MODELS.find { it.id == model })?.name ?: model
 
-    private suspend fun chat(messages: List<ChatMessage>, max: Int = 700): Pair<String, String> {
-        val r = OpenRouter.chat(apiKey, model, messages, max)
+    /** One OpenRouter call, with session cost accounting. Throws [EmptyReply] when the model says nothing. */
+    private suspend fun complete(messages: List<ChatMessage>, max: Int, json: Boolean): Pair<ChatResult, String> {
+        val r = OpenRouter.chat(apiKey, model, messages, max, json)
         calls += 1
         cost += r.cost ?: 0.0
+        if (r.text.isBlank()) {
+            throw EmptyReply(
+                if (r.finishReason == "length") "модель потратила весь лимит токенов на рассуждения и ничего не ответила. Попробуйте другую модель."
+                else "модель вернула пустой ответ."
+            )
+        }
         val meta = (r.model ?: model) + if (showCost && r.cost != null) " · " + fmtCost(r.cost) else ""
-        return r.text to meta
+        return r to meta
     }
+
+    private suspend fun chat(messages: List<ChatMessage>, max: Int): Pair<String, String> =
+        complete(messages, max, json = false).let { (r, meta) -> r.text to meta }
+
+    /** For structured tasks: parses the reply, retrying once on an empty, broken or truncated JSON reply. */
+    private suspend fun chatJson(messages: List<ChatMessage>, max: Int): Pair<JSONObject, String> {
+        var last: Exception? = null
+        repeat(2) {
+            try {
+                val (r, meta) = complete(messages, max, json = true)
+                try {
+                    return parseModelJson(r.text) to meta
+                } catch (e: JSONException) {
+                    last = if (r.finishReason == "length") EmptyReply("ответ модели обрезан по лимиту токенов.") else EmptyReply("модель вернула некорректный JSON.")
+                }
+            } catch (e: EmptyReply) {
+                last = e
+            }
+        }
+        throw last!!
+    }
+
+    private class EmptyReply(message: String) : Exception(message)
 
     // ── Settings ───────────────────────────────────────────────────────────
 
@@ -333,29 +367,29 @@ class ErgoViewModel(app: Application) : AndroidViewModel(app) {
         genLoading = true
         viewModelScope.launch {
             try {
-                val (text, meta) = chat(
+                val (o, meta) = chatJson(
                     listOf(
                         ChatMessage("system", SYS_DRILL),
                         ChatMessage("user", "Новое упражнение. Выбери одну ошибку случайно из списка: $FALLACIES. Не используй: ${drill.answer}."),
-                    )
+                    ),
+                    4000,
                 )
-                val o = parseModelJson(text)
-                val answer = o.optString("answer")
+                val answer = o.str("answer")
                 val flawed = o.optJSONArray("flawed")?.let { a -> (0 until a.length()).map { a.optInt(it) } }
                     ?: listOf(o.optInt("flawed"))
                 var opts = o.stringList("options").take(4)
                 if (answer !in opts) opts = (listOf(answer) + opts).take(4)
                 val sentences = o.stringList("sentences")
                 if (sentences.isEmpty()) throw IllegalStateException("модель вернула неожиданный формат")
-                val whyNot = o.optJSONObject("whyNot")?.let { w -> w.keys().asSequence().associateWith { w.optString(it) } }.orEmpty()
+                val whyNot = o.optJSONObject("whyNot")?.let { w -> w.keys().asSequence().associateWith { w.str(it) } }.orEmpty()
                 resetDrill(
                     Drill(
-                        source = o.optString("source").ifEmpty { "Сгенерированный фрагмент" },
+                        source = o.str("source").ifEmpty { "Сгенерированный фрагмент" },
                         sentences = sentences,
                         flawed = flawed,
                         answer = answer,
                         options = opts.shuffled(),
-                        explanation = o.optString("explanation"),
+                        explanation = o.str("explanation"),
                         whyNot = whyNot,
                         ai = true,
                         meta = meta,
@@ -395,7 +429,7 @@ class ErgoViewModel(app: Application) : AndroidViewModel(app) {
                                 "Объясни, почему «$picked» не подходит и что выдаёт «${d.answer}». Закончи одним коротким вопросом, который проверяет разницу.",
                         ),
                     ),
-                    300,
+                    1500,
                 )
                 drillExplain = text.trim()
                 drillExplainMeta = meta
@@ -432,19 +466,18 @@ class ErgoViewModel(app: Application) : AndroidViewModel(app) {
                 return@launch
             }
             try {
-                val (out, meta) = chat(listOf(ChatMessage("system", SYS_AN), ChatMessage("user", text)), 900)
-                val o = parseModelJson(out)
+                val (o, meta) = chatJson(listOf(ChatMessage("system", SYS_AN), ChatMessage("user", text)), 4000)
                 val issues = o.optJSONArray("issues")?.let { a ->
                     (0 until a.length()).mapNotNull { a.optJSONObject(it) }
-                        .map { Issue(it.optString("name"), it.optString("quote"), it.optString("note")) }
+                        .map { Issue(it.str("name"), it.str("quote"), it.str("note")) }
                 }.orEmpty()
                 anResult = Analysis(
-                    conclusion = o.optString("conclusion").ifEmpty { "—" },
+                    conclusion = o.str("conclusion").ifEmpty { "—" },
                     premises = o.stringList("premises"),
                     assumptions = o.stringList("assumptions"),
                     issues = issues,
-                    verdict = o.optString("verdict").ifEmpty { "Moderate" },
-                    summary = o.optString("summary"),
+                    verdict = o.str("verdict").ifEmpty { "Moderate" },
+                    summary = o.str("summary"),
                 )
                 anSource = text
                 anMeta = "Разобрано моделью $meta"
@@ -480,15 +513,11 @@ class ErgoViewModel(app: Application) : AndroidViewModel(app) {
                     SPAR_DEMO[sparI % SPAR_DEMO.size] to demoFlag(txt)
                 } else {
                     val hist = msgs.map { ChatMessage(if (it.fromMe) "user" else "assistant", it.text) }
-                    val (text, _) = chat(listOf(ChatMessage("system", sysSpar(topic.motion))) + hist, 400)
-                    val parsed = runCatching { parseModelJson(text) }.getOrNull()
-                    if (parsed != null && parsed.has("reply")) {
-                        val f = parsed.optJSONObject("flag")
-                        val name = f?.optString("name").orEmpty()
-                        parsed.optString("reply") to if (name.isNotEmpty()) Flag(name, f!!.optString("quote"), f.optString("note")) else null
-                    } else {
-                        text to null
-                    }
+                    val (parsed, _) = chatJson(listOf(ChatMessage("system", sysSpar(topic.motion))) + hist, 2000)
+                    val f = parsed.optJSONObject("flag")
+                    val name = f?.str("name").orEmpty()
+                    val reply = parsed.str("reply").ifBlank { throw EmptyReply("модель вернула пустой ответ.") }
+                    reply to if (name.isNotEmpty()) Flag(name, f!!.str("quote"), f.str("note")) else null
                 }
             } catch (e: Exception) {
                 sparLoading = false

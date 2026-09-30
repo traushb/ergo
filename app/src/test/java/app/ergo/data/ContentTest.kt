@@ -47,4 +47,19 @@ class ContentTest {
         assertEquals("Нет.", o.getString("reply"))
         assertEquals(listOf("a", "b"), parseModelJson("{\"s\": [\"a\", null, \"b\"]}").stringList("s"))
     }
+
+    @Test fun jsonNullFieldsReadAsEmpty() {
+        val o = org.json.JSONObject("{\"source\": null, \"answer\": \"Ложная дилемма\"}")
+        assertEquals("", o.str("source"))
+        assertEquals("", o.str("missing"))
+        assertEquals("Ложная дилемма", o.str("answer"))
+    }
+
+    @Test(expected = org.json.JSONException::class) fun truncatedReplyIsJsonError() {
+        parseModelJson("{\"source\": \"Рабочий чат\", \"sentences\": [\"Думаю,")
+    }
+
+    @Test(expected = org.json.JSONException::class) fun nullReplyIsJsonError() {
+        parseModelJson("null")
+    }
 }

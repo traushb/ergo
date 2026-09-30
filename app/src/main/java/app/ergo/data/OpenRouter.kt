@@ -3,6 +3,7 @@ package app.ergo.data
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
 import java.net.HttpURLConnection
@@ -15,7 +16,8 @@ data class ModelInfo(val id: String, val name: String, val ctx: Int?, val prompt
 
 data class ChatMessage(val role: String, val content: String)
 
-data class ChatResult(val text: String, val model: String?, val cost: Double?)
+/** [finishReason] is OpenRouter's normalized reason: "stop", "length", "content_filter", … */
+data class ChatResult(val text: String, val model: String?, val cost: Double?, val finishReason: String?)
 
 const val AUTO_MODEL = "openrouter/auto"
 
@@ -59,17 +61,34 @@ object OpenRouter {
         }
     }
 
-    suspend fun chat(key: String, model: String, messages: List<ChatMessage>, maxTokens: Int): ChatResult {
+    /**
+     * [json] asks for a JSON-object reply where the model supports it (others ignore it).
+     * Reasoning effort is kept low: these are short tasks, and reasoning models can otherwise
+     * spend the whole token budget thinking and return no text.
+     */
+    suspend fun chat(key: String, model: String, messages: List<ChatMessage>, maxTokens: Int, json: Boolean = false): ChatResult {
         val body = JSONObject()
             .put("model", model)
             .put("messages", JSONArray(messages.map { JSONObject().put("role", it.role).put("content", it.content) }))
             .put("max_tokens", maxTokens)
             .put("temperature", 0.8)
+            .put("reasoning", JSONObject().put("effort", "low").put("exclude", true))
             .put("usage", JSONObject().put("include", true))
+        if (json) body.put("response_format", JSONObject().put("type", "json_object"))
         val j = request("POST", "/chat/completions", key, body)
-        val text = j.optJSONArray("choices")?.optJSONObject(0)?.optJSONObject("message")?.optString("content").orEmpty()
+        val choice = j.optJSONArray("choices")?.optJSONObject(0)
         val cost = j.optJSONObject("usage")?.optDoubleOrNull("cost")
-        return ChatResult(text, j.optStringOrNull("model"), cost)
+        return ChatResult(messageText(choice?.optJSONObject("message")), j.optStringOrNull("model"), cost, choice?.optStringOrNull("finish_reason"))
+    }
+
+    /** `content` may be a string, JSON null (optString would turn that into "null"), or a list of parts. */
+    private fun messageText(message: JSONObject?): String {
+        val c = message?.opt("content") ?: return ""
+        return when (c) {
+            is String -> c
+            is JSONArray -> (0 until c.length()).mapNotNull { c.optJSONObject(it)?.optStringOrNull("text") }.joinToString("")
+            else -> ""
+        }
     }
 
     private suspend fun request(method: String, path: String, key: String?, body: JSONObject?): JSONObject =
@@ -110,9 +129,12 @@ private fun JSONObject.optDoubleOrNull(k: String): Double? =
 /** Models sometimes wrap JSON in prose or code fences; take the outermost object. */
 fun parseModelJson(t: String): JSONObject {
     val cleaned = t.replace("```json", "").replace("```", "")
-    val m = Regex("\\{[\\s\\S]*\\}").find(cleaned)
-    return JSONObject(m?.value ?: cleaned)
+    val m = Regex("\\{[\\s\\S]*\\}").find(cleaned) ?: throw JSONException("в ответе модели нет JSON")
+    return JSONObject(m.value)
 }
+
+/** Like optString, but a JSON null reads as "" (Android's optString returns the text "null"). */
+fun JSONObject.str(k: String): String = optStringOrNull(k).orEmpty()
 
 fun JSONObject.stringList(k: String): List<String> {
     val a = optJSONArray(k) ?: return emptyList()
