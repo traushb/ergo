@@ -40,7 +40,7 @@ Fonts are bundled from Google Fonts under the SIL OFL, with licenses in `license
 
 ## Build
 
-Requires the Android SDK (compileSdk 35) and JDK 17+.
+Requires the Android SDK (compileSdk 35) and an installed **JDK 21**. `gradle/gradle-daemon-jvm.properties` makes Gradle (and Android Studio) run the build on JDK 21 even when the default Java is newer. Gradle 8.14 can't run on JDK 25, which recent Fedora and Android Studio ship. On Fedora: `sudo dnf install java-21-openjdk-devel`.
 
 ```
 ./gradlew :app:assembleDebug
