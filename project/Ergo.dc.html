@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..600&amp;family=Onest:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&amp;display=block" rel="stylesheet">
+<style>
+body{margin:0;background:#E2DCD0;-webkit-font-smoothing:antialiased}
+a{color:#BF3B2A;text-underline-offset:3px}
+a:hover{color:#1E1C19}
+button{font:inherit}
+input,textarea{font:inherit;color:inherit}
+input::placeholder,textarea::placeholder{color:#9A9386}
+@keyframes ergoPulse{0%,100%{opacity:.2}50%{opacity:1}}
+</style>
+</helmet>
+<div lang="ru" style="min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:40px 24px;box-sizing:border-box;background:#E2DCD0">
+<x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" bg="#F4F0E8" hint-size="412px,892px">
+<div style="position:absolute;inset:0;display:flex;flex-direction:column;background:#F4F0E8;color:#1E1C19;font-family:'Onest', system-ui, sans-serif">
+
+<sc-if value="{{ isOnboarding }}" hint-placeholder-val="{{ true }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:12px 28px 28px;overflow:auto">
+  <div style="display:flex;align-items:center;gap:12px;height:48px">
+    <sc-if value="{{ obShowBack }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ obBack }}" style="width:40px;height:40px;margin-left:-10px;border:none;background:none;border-radius:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1E1C19" style-hover="background:#E9E3D7"><span class="material-symbols-outlined" style="font-size:24px">arrow_back</span></button>
+    </sc-if>
+    <div style="flex:1"></div>
+    <div style="display:flex;gap:6px">
+      <sc-for list="{{ obBars }}" as="b" hint-placeholder-count="3"><div style="{{ b.style }}"></div></sc-for>
+    </div>
+  </div>
+
+  <sc-if value="{{ ob0 }}" hint-placeholder-val="{{ true }}">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:28px">
+    <div style="position:relative;width:64px;height:56px">
+      <div style="position:absolute;left:23px;top:0;width:18px;height:18px;border-radius:50%;background:#BF3B2A"></div>
+      <div style="position:absolute;left:0;bottom:0;width:18px;height:18px;border-radius:50%;background:#1E1C19"></div>
+      <div style="position:absolute;right:0;bottom:0;width:18px;height:18px;border-radius:50%;background:#1E1C19"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="font-family:'JetBrains Mono', monospace;font-size:12px;letter-spacing:.12em;color:#6A6459">ERGO · НЕФОРМАЛЬНАЯ ЛОГИКА</div>
+      <h1 style="margin:0;font-family:'Literata', Georgia, serif;font-weight:500;font-size:36px;line-height:1.12;letter-spacing:-.02em;text-wrap:pretty">Научитесь отличать хороший аргумент от <em style="font-style:italic;text-decoration:underline wavy #BF3B2A;text-decoration-thickness:1.5px;text-underline-offset:7px;text-decoration-skip-ink:none">убедительно звучащего</em>.</h1>
+      <p style="margin:0;font-size:16px;line-height:1.5;color:#5B564D;text-wrap:pretty">Шесть коротких разделов о том, как устроены рассуждения и где они ломаются. Упражнения, карты аргументов и оппонент для спора на модели, которую выберете вы.</p>
+    </div>
+    <button onClick="{{ obNext }}" style="height:56px;border:none;border-radius:28px;background:#1E1C19;color:#F4F0E8;font-size:16px;font-weight:600;cursor:pointer" style-hover="background:#3A3630">Начать</button>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ ob1 }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1;display:flex;flex-direction:column;gap:24px;padding-top:24px">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-family:'Literata', Georgia, serif;font-weight:500;font-size:32px;line-height:1.12;letter-spacing:-.02em">Что вас сюда привело?</h2>
+      <p style="margin:0;font-size:15px;line-height:1.5;color:#5B564D">От этого зависят примеры, а не программа.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <sc-for list="{{ goals }}" as="g" hint-placeholder-count="4">
+        <button onClick="{{ g.onClick }}" style="{{ g.style }}">
+          <div style="display:flex;flex-direction:column;gap:3px;flex:1;text-align:left">
+            <span style="font-size:16px;font-weight:600">{{ g.title }}</span>
+            <span style="font-size:14px;color:#6A6459">{{ g.sub }}</span>
+          </div>
+          <span class="material-symbols-outlined" style="{{ g.iconStyle }}">{{ g.icon }}</span>
+        </button>
+      </sc-for>
+    </div>
+    <div style="flex:1"></div>
+    <button onClick="{{ obNext }}" style="{{ obContinueStyle }}">Продолжить</button>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ ob2 }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1;display:flex;flex-direction:column;gap:22px;padding-top:24px">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <h2 style="margin:0;font-family:'Literata', Georgia, serif;font-weight:500;font-size:32px;line-height:1.12;letter-spacing:-.02em">Подключите свою модель.</h2>
+      <p style="margin:0;font-size:15px;line-height:1.5;color:#5B564D;text-wrap:pretty">Новые упражнения, объяснения и карты аргументов работают через OpenRouter на выбранной вами модели. Ключ хранится только на этом устройстве, а OpenRouter выставляет счёт напрямую. Одно упражнение обычно стоит доли цента.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <label style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:.1em;color:#6A6459">API-КЛЮЧ OPENROUTER</label>
+      <div style="{{ keyFieldStyle }}">
+        <span class="material-symbols-outlined" style="font-size:20px;color:#6A6459">key</span>
+        <input value="{{ keyInput }}" onChange="{{ onKeyInput }}" placeholder="sk-or-v1-…" spellcheck="false" autocomplete="off" style="flex:1;min-width:0;border:none;outline:none;background:transparent;font-family:'JetBrains Mono', monospace;font-size:14px">
+        <button onClick="{{ verifyKey }}" style="height:36px;padding:0 14px;border:none;border-radius:18px;background:#1E1C19;color:#F4F0E8;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap">{{ verifyLabel }}</button>
+      </div>
+      <sc-if value="{{ keyOk }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:#2E58B8"><span class="material-symbols-outlined" style="font-size:18px">check_circle</span><span>{{ keyOkText }}</span></div>
+      </sc-if>
+      <sc-if value="{{ keyErr }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:flex-start;gap:8px;font-size:14px;line-height:1.4;color:#BF3B2A"><span class="material-symbols-outlined" style="font-size:18px">error</span><span>{{ keyError }}</span></div>
+      </sc-if>
+      <div style="font-size:14px;color:#6A6459">Ещё нет ключа? <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">Создайте на openrouter.ai/keys</a></div>
+    </div>
+    <button onClick="{{ openSheet }}" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid #D9D2C4;border-radius:16px;background:#FBF9F4;cursor:pointer;text-align:left;color:#1E1C19" style-hover="border-color:#1E1C19">
+      <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0">
+        <span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:.1em;color:#6A6459">МОДЕЛЬ</span>
+        <span style="font-size:16px;font-weight:600">{{ modelName }}</span>
+        <span style="font-family:'JetBrains Mono', monospace;font-size:12px;color:#6A6459;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ model }}</span>
+      </div>
+      <span class="material-symbols-outlined" style="font-size:22px;color:#6A6459">unfold_more</span>
+    </button>
+    <div style="flex:1"></div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <button onClick="{{ finishOnboarding }}" style="{{ startStyle }}">Начать обучение</button>
+      <button onClick="{{ skipDemo }}" style="height:48px;border:none;background:none;color:#1E1C19;font-size:15px;font-weight:500;cursor:pointer;text-decoration:underline;text-underline-offset:4px">Пропустить и открыть демо-режим</button>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isApp }}" hint-placeholder-val="{{ false }}">
+<div ref="{{ mainRef }}" style="flex:1;min-height:0;overflow:auto">
+
+  <sc-if value="{{ tabLearn }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;flex-direction:column;gap:24px;padding:12px 20px 32px">
+    <div style="display:flex;align-items:center;gap:10px;height:44px">
+      <div style="position:relative;width:24px;height:21px">
+        <div style="position:absolute;left:8.5px;top:0;width:7px;height:7px;border-radius:50%;background:#BF3B2A"></div>
+        <div style="position:absolute;left:0;bottom:0;width:7px;height:7px;border-radius:50%;background:#1E1C19"></div>
+        <div style="position:absolute;right:0;bottom:0;width:7px;height:7px;border-radius:50%;background:#1E1C19"></div>
+      </div>
+      <span style="font-family:'Literata', Georgia, serif;font-size:26px;font-weight:600;letter-spacing:-.02em">Ergo</span>
+      <div style="flex:1"></div>
+      <div style="display:flex;align-items:center;gap:4px;height:32px;padding:0 12px 0 8px;border-radius:16px;background:#ECE6DA;font-size:14px;font-weight:600;white-space:nowrap"><span class="material-symbols-outlined" style="font-size:18px;color:#BF3B2A;font-variation-settings:'FILL' 1">local_fire_department</span>6 дней</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:18px;padding:22px;border-radius:24px;background:#1E1C19;color:#F4F0E8">
+      <div style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:.12em;color:#B8AF9F">{{ contKicker }}</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-family:'Literata', Georgia, serif;font-size:34px;font-weight:500;line-height:1.05;letter-spacing:-.02em">{{ contTitle }}</div>
+        <div style="font-family:'Literata', Georgia, serif;font-style:italic;font-size:18px;color:#D8D0C1">{{ contSub }}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:14px;color:#B8AF9F;white-space:nowrap">4 мин · 5 шагов</span>
+        <div style="flex:1"></div>
+        <button onClick="{{ continueLesson }}" style="display:flex;align-items:center;gap:6px;height:44px;padding:0 18px 0 20px;border:none;border-radius:22px;background:#BF3B2A;color:#fff;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap" style-hover="background:#A93322">Продолжить<span class="material-symbols-outlined" style="font-size:20px">arrow_forward</span></button>
+      </div>
+    </div>
+
+    <button onClick="{{ goReview }}" style="display:flex;align-items:center;gap:14px;padding:16px 18px;border:1px solid #D9D2C4;border-radius:18px;background:#FBF9F4;cursor:pointer;text-align:left;color:#1E1C19" style-hover="border-color:#1E1C19">
+      <div style="flex:none;width:44px;height:44px;border-radius:22px;background:#DFE6F4;color:#2E58B8;display:flex;align-items:center;justify-content:center;font-family:'Literata', Georgia, serif;font-size:20px;font-weight:600">9</div>
+      <div style="display:flex;flex-direction:column;gap:2px;flex:1">
+        <span style="font-size:16px;font-weight:600">Повторение</span>
+        <span style="font-size:14px;color:#6A6459">Карточки на сегодня, интервалы 1 · 3 · 7 · 21 день</span>
+      </div>
+      <span class="material-symbols-outlined" style="font-size:22px;color:#6A6459">chevron_right</span>
+    </button>
+
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:8px">
+        <h3 style="margin:0;font-family:'Literata', Georgia, serif;font-size:24px;font-weight:500">Программа</h3>
+        <span style="font-family:'JetBrains Mono', monospace;font-size:12px;color:#6A6459">{{ doneCount }} из 23 уроков</span>
+      </div>
+      <sc-for list="{{ units }}" as="u" hint-placeholder-count="6">
+        <div style="border-top:1px solid #D9D2C4">
+          <button onClick="{{ u.toggle }}" style="width:100%;display:flex;align-items:center;gap:14px;padding:14px 0;border:none;background:none;cursor:pointer;text-align:left;color:#1E1C19">
+            <span style="{{ u.numStyle }}">{{ u.n }}</span>
+            <div style="display:flex;flex-direction:column;gap:2px;flex:1">
+              <span style="font-size:16px;font-weight:600">{{ u.title }}</span>
+              <span style="font-family:'JetBrains Mono', monospace;font-size:12px;color:#6A6459">{{ u.meta }}</span>
+            </div>
+            <span class="material-symbols-outlined" style="{{ u.chevStyle }}">expand_more</span>
+          </button>
+          <sc-if value="{{ u.open }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;padding:0 0 12px 50px">
+              <sc-for list="{{ u.lessons }}" as="l" hint-placeholder-count="4">
+                <button onClick="{{ l.onClick }}" style="display:flex;align-items:center;gap:12px;min-height:48px;border:none;background:none;cursor:pointer;text-align:left;padding:0;color:#1E1C19">
+                  <span class="material-symbols-outlined" style="{{ l.iconStyle }}">{{ l.icon }}</span>
+                  <span style="{{ l.nameStyle }}">{{ l.name }}</span>
+                  <span style="font-family:'JetBrains Mono', monospace;font-size:12px;color:#6A6459;white-space:nowrap">{{ l.meta }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ tabDrill }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;flex-direction:column;gap:18px;padding:12px 20px 28px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-top:6px">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <h2 style="margin:0;font-family:'Literata', Georgia, serif;font-size:32px;font-weight:500;letter-spacing:-.02em;line-height:1.05">Практика</h2>
+        <span style="font-size:15px;color:#5B564D">Найдите ошибку и назовите её.</span>
+      </div>
+      <span style="font-family:'JetBrains Mono', monospace;font-size:12px;color:#6A6459;padding-bottom:3px;white-space:nowrap;flex:none">{{ drillScoreText }}</span>
+    </div>
+    <div style="display:flex;gap:6px">
+      <sc-for list="{{ drillSteps }}" as="st" hint-placeholder-count="3">
+        <div style="{{ st.style }}"><span style="font-family:'JetBrains Mono', monospace;font-size:11px">{{ st.n }}</span>{{ st.label }}</div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;padding:20px 20px 22px;border:1px solid #D9D2C4;border-radius:20px;background:#FBF9F4">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:.08em;color:#6A6459;text-transform:uppercase;flex:1">{{ drill.source }}</span>
+        <sc-if value="{{ drill.ai }}" hint-placeholder-val="{{ false }}">
+          <span style="display:flex;align-items:center;gap:4px;height:24px;padding:0 9px;border-radius:12px;background:#DFE6F4;color:#2E58B8;font-size:12px;font-weight:600;white-space:nowrap"><span class="material-symbols-outlined" style="font-size:14px">auto_awesome</span>Новое</span>
+        </sc-if>
+      </div>
+      <p style="margin:0;font-family:'Literata', Georgia, serif;font-size:20px;line-height:1.55;text-wrap:pretty">
+        <sc-for list="{{ drillSents }}" as="sn" hint-placeholder-count="3"><span onClick="{{ sn.onClick }}" style="{{ sn.style }}">{{ sn.text }}</span> </sc-for>
+      </p>
+    </div>
+    <div style="{{ drillHintStyle }}">{{ drillHint }}</div>
+
+    <sc-if value="{{ drillShowOptions }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+        <sc-for list="{{ drillOptions }}" as="o" hint-placeholder-count="4">
+          <button onClick="{{ o.onClick }}" style="{{ o.style }}">{{ o.name }}</button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ drillIsResult }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px;padding-top:4px">
+        <div style="{{ verdictStyle }}"><span class="material-symbols-outlined" style="font-size:22px">{{ verdictIcon }}</span>{{ verdictText }}</div>
+        <p style="margin:0;font-family:'Literata', Georgia, serif;font-size:17px;line-height:1.55;text-wrap:pretty">{{ drill.explanation }}</p>
+        <sc-if value="{{ canAskWhy }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ explainWrong }}" style="align-self:flex-start;display:flex;align-items:center;gap:8px;min-height:44px;padding:8px 18px;border:1.5px solid #BF3B2A;border-radius:22px;background:transparent;color:#BF3B2A;font-size:15px;font-weight:600;cursor:pointer;text-align:left" style-hover="background:#F5DED7"><span class="material-symbols-outlined" style="font-size:18px">help</span>{{ whyLabel }}</button>
+        </sc-if>
+        <sc-if value="{{ drillExplainLoading }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;color:#BF3B2A;font-size:14px">{{ dots }}<span>Разбираемся…</span></div>
+        </sc-if>
+        <sc-if value="{{ hasExplain }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:10px;padding:16px 18px;border-left:3px solid #BF3B2A;background:#F5DED7;border-radius:0 14px 14px 0">
+            <span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:.1em;color:#8E2A1D">ПОЧЕМУ НЕ «{{ drillPickUpper }}»</span>
+            <p style="margin:0;font-size:15px;line-height:1.55;color:#1E1C19;white-space:pre-wrap">{{ drillExplain }}</p>
+            <span style="font-family:'JetBrains Mono', monospace;font-size:11px;color:#8E2A1D">{{ drillExplainMeta }}</span>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <div style="display:flex;gap:10px;padding-top:6px">
+      <button onClick="{{ nextDrill }}" style="flex:1;height:52px;border:1.5px solid #1E1C19;border-radius:26px;background:transparent;color:#1E1C19;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#ECE6DA">Дальше</button>
+      <button onClick="{{ genDrill }}" style="flex:1.4;display:flex;align-items:center;justify-content:center;gap:8px;height:52px;border:none;border-radius:26px;background:#1E1C19;color:#F4F0E8;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap" style-hover="background:#3A3630"><span class="material-symbols-outlined" style="font-size:18px">auto_awesome</span>{{ genLabel }}</button>
+    </div>
+    <sc-if value="{{ drillMetaShow }}" hint-placeholder-val="{{ false }}">
+      <div style="font-family:'JetBrains Mono', monospace;font-size:11px;color:#6A6459;text-align:center">{{ drillMeta }}</div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ tabAnalyze }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;flex-direction:column;gap:18px;padding:12px 20px 32px">
+    <div style="display:flex;flex-direction:column;gap:6px;padding-top:6px">
+      <h2 style="margin:0;font-family:'Literata', Georgia, serif;font-size:32px;font-weight:500;letter-spacing:-.02em;line-height:1.05">Анализ</h2>
+      <span style="font-size:15px;line-height:1.45;color:#5B564D;text-wrap:pretty">Вставьте любой аргумент: колонку, пост, рекламу. Ergo покажет его скелет и отметит слабые места.</span>
+    </div>
+    <textarea value="{{ anText }}" onChange="{{ onAnText }}" placeholder="Вставьте или напишите аргумент…" style="min-height:150px;resize:none;padding:16px 18px;border:1px solid #D9D2C4;border-radius:18px;background:#FBF9F4;outline:none;font-family:'Literata', Georgia, serif;font-size:17px;line-height:1.5;box-sizing:border-box;width:100%" style-focus="border-color:#1E1C19"></textarea>
+    <div style="display:flex;flex-wrap:wrap;gap:8px">
+      <sc-for list="{{ samples }}" as="sm" hint-placeholder-count="2">
+        <button onClick="{{ sm.onClick }}" style="display:flex;align-items:center;gap:6px;height:34px;padding:0 14px 0 10px;border:1px solid #D9D2C4;border-radius:17px;white-space:nowrap;background:transparent;color:#1E1C19;font-size:13px;font-weight:500;cursor:pointer" style-hover="background:#ECE6DA"><span class="material-symbols-outlined" style="font-size:16px">content_paste</span>{{ sm.label }}</button>
+      </sc-for>
+    </div>
+    <button onClick="{{ analyze }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:54px;border:none;border-radius:27px;background:#1E1C19;color:#F4F0E8;font-size:16px;font-weight:600;cursor:pointer" style-hover="background:#3A3630"><sc-if value="{{ anLoading }}" hint-placeholder-val="{{ false }}">{{ dots }}</sc-if><span class="material-symbols-outlined" style="font-size:20px">account_tree</span>{{ anLabel }}</button>
+
+    <sc-if value="{{ anHas }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:22px;padding-top:8px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:.12em;color:#6A6459">С ПОМЕТКАМИ</span>
+        <p style="margin:0;font-family:'Literata', Georgia, serif;font-size:17px;line-height:1.7;text-wrap:pretty"><sc-for list="{{ anSegs }}" as="sg" hint-placeholder-count="3"><span style="{{ sg.style }}">{{ sg.t }}</span><sc-if value="{{ sg.marked }}" hint-placeholder-val="{{ false }}"><sup style="font-family:'JetBrains Mono', monospace;font-size:11px;font-weight:500;color:#BF3B2A;padding-left:2px">{{ sg.n }}</sup></sc-if></sc-for></p>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:0">
+        <span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:.12em;color:#6A6459;padding-bottom:10px">СКЕЛЕТ</span>
+        <div style="display:flex;flex-direction:column;gap:6px;padding:16px 18px;border:2px solid #1E1C19;border-radius:16px;background:#FBF9F4">
+          <span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:.1em;color:#1E1C19">∴ ВЫВОД</span>
+          <span style="font-family:'Literata', Georgia, serif;font-size:19px;line-height:1.35;font-weight:500">{{ an.conclusion }}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-left:24px;padding:14px 0 4px 18px;border-left:2px solid #2E58B8">
+          <sc-for list="{{ anPremises }}" as="pr" hint-placeholder-count="2">
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:#DFE6F4">
+              <span style="font-family:'JetBrains Mono', monospace;font-size:12px;font-weight:500;color:#2E58B8;padding-top:2px">{{ pr.id }}</span>
+              <span style="font-size:15px;line-height:1.45">{{ pr.text }}</span>
+            </div>
+          </sc-for>
+          <sc-for list="{{ anAssumptions }}" as="as" hint-placeholder-count="1">
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:11px 13px;border-radius:14px;border:1.5px dashed #8A8376">
+              <span style="font-family:'JetBrains Mono', monospace;font-size:12px;font-weight:500;color:#6A6459;padding-top:2px">{{ as.id }}</span>
+              <div style="display:flex;flex-direction:column;gap:2px">
+                <span style="font-family:'JetBrains Mono', monospace;font-size:10px;letter-spacing:.1em;color:#6A6459">НЕЯВНОЕ ДОПУЩЕНИЕ</span>
+                <span style="font-size:15px;line-height:1.45;font-style:italic;color:#3F3B35">{{ as.text }}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:.12em;color:#BF3B2A">КРАСНЫЙ КАРАНДАШ</span>
+        <sc-for list="{{ anIssues }}" as="is" hint-placeholder-count="2">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <span style="flex:none;width:24px;height:24px;border-radius:12px;border:1.5px solid #BF3B2A;color:#BF3B2A;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono', monospace;font-size:12px;font-weight:500">{{ is.n }}</span>
+            <div style="display:flex;flex-direction:column;gap:4px;padding-top:1px">
+              <span style="font-size:16px;font-weight:700;color:#BF3B2A">{{ is.name }}</span>
+              <span style="font-size:15px;line-height:1.5;color:#3F3B35">{{ is.note }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;padding:18px 20px;border-radius:18px;background:#1E1C19;color:#F4F0E8">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:.12em;color:#B8AF9F">ИТОГ</span>
+          <div style="display:flex;gap:5px"><sc-for list="{{ anDots }}" as="d" hint-placeholder-count="3"><span style="{{ d.style }}"></span></sc-for></div>
+        </div>
+        <span style="font-family:'Literata', Georgia, serif;font-size:26px;font-weight:500;line-height:1.1">{{ anVerdict }}</span>
+        <span style="font-size:15px;line-height:1.5;color:#D8D0C1">{{ an.summary }}</span>
+      </div>
+      <div style="font-family:'JetBrains Mono', monospace;font-size:11px;color:#6A6459;text-align:center">{{ anMeta }}</div>
+    </div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ tabSpar }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;flex-direction:column;gap:18px;padding:12px 20px 24px">
+    <sc-if value="{{ sparPicking }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:6px;padding-top:6px">
+        <h2 style="margin:0;font-family:'Literata', Georgia, serif;font-size:32px;font-weight:500;letter-spacing:-.02em;line-height:1.05">Спор</h2>
+        <span style="font-size:15px;line-height:1.45;color:#5B564D;text-wrap:pretty">Вы защищаете тезис. Ergo спорит с вами и обводит каждую логическую ошибку, которую вы допустите.</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ topics }}" as="tp" hint-placeholder-count="3">
+          <button onClick="{{ tp.onClick }}" style="display:flex;flex-direction:column;gap:10px;padding:18px 20px;border:1px solid #D9D2C4;border-radius:20px;background:#FBF9F4;cursor:pointer;text-align:left;color:#1E1C19" style-hover="border-color:#1E1C19">
+            <span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:.12em;color:#6A6459">ТЕЗИС</span>
+            <span style="font-family:'Literata', Georgia, serif;font-size:20px;line-height:1.3;font-weight:500">{{ tp.motion }}</span>
+            <span style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:#BF3B2A">Защищать<span class="material-symbols-outlined" style="font-size:18px">arrow_forward</span></span>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ sparActive }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:4px 0 12px;border-bottom:1px solid #D9D2C4">
+        <button onClick="{{ endSpar }}" style="flex:none;width:40px;height:40px;margin-left:-8px;border:none;background:none;border-radius:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1E1C19" style-hover="background:#E9E3D7"><span class="material-symbols-outlined" style="font-size:22px">arrow_back</span></button>
+        <div style="display:flex;flex-direction:column;gap:3px;flex:1;padding-top:2px">
+          <span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:.1em;color:#6A6459">ВЫ: ЗА · ERGO: ПРОТИВ</span>
+          <span style="font-family:'Literata', Georgia, serif;font-size:16px;line-height:1.35;font-weight:500">{{ sparMotion }}</span>
+        </div>
+        <span style="flex:none;display:flex;align-items:center;gap:4px;height:28px;padding:0 10px;border-radius:14px;background:#F5DED7;color:#BF3B2A;font-size:13px;font-weight:700;margin-top:4px;white-space:nowrap"><span class="material-symbols-outlined" style="font-size:15px">edit</span>{{ sparFlagCount }}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <sc-for list="{{ sparMsgs }}" as="m" hint-placeholder-count="2">
+          <sc-if value="{{ m.isAi }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:6px;max-width:88%">
+              <span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:.1em;color:#6A6459">ERGO</span>
+              <div style="padding:14px 16px;border:1px solid #D9D2C4;border-radius:4px 18px 18px 18px;background:#FBF9F4;font-family:'Literata', Georgia, serif;font-size:16px;line-height:1.55">{{ m.text }}</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ m.isMe }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+              <div style="max-width:84%;padding:12px 16px;border-radius:18px 4px 18px 18px;background:#1E1C19;color:#F4F0E8;font-size:15px;line-height:1.5">{{ m.text }}</div>
+              <sc-if value="{{ m.hasFlag }}" hint-placeholder-val="{{ false }}">
+                <div style="max-width:84%;display:flex;flex-direction:column;gap:4px;padding:10px 14px;border:1.5px solid #BF3B2A;border-radius:14px;background:#FBF9F4">
+                  <span style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:#BF3B2A"><span class="material-symbols-outlined" style="font-size:16px">edit</span>{{ m.flagName }}</span>
+                  <span style="font-family:'Literata', Georgia, serif;font-style:italic;font-size:15px;color:#3F3B35">«{{ m.flagQuote }}»</span>
+                  <span style="font-size:14px;line-height:1.45;color:#3F3B35">{{ m.flagNote }}</span>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+        </sc-for>
+        <sc-if value="{{ sparLoading }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:10px;color:#6A6459;font-size:14px">{{ dots }}<span>Ergo готовит возражение…</span></div>
+        </sc-if>
+      </div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ tabYou }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;flex-direction:column;gap:24px;padding:12px 20px 32px">
+    <h2 style="margin:0;padding-top:6px;font-family:'Literata', Georgia, serif;font-size:32px;font-weight:500;letter-spacing:-.02em;line-height:1.05">Профиль</h2>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid #D9D2C4;border-bottom:1px solid #D9D2C4">
+      <div style="display:flex;flex-direction:column;gap:2px;padding:14px 0"><span style="font-family:'Literata', Georgia, serif;font-size:30px;font-weight:500">6</span><span style="font-size:13px;color:#6A6459">дней подряд</span></div>
+      <div style="display:flex;flex-direction:column;gap:2px;padding:14px 0 14px 14px;border-left:1px solid #D9D2C4"><span style="font-family:'Literata', Georgia, serif;font-size:30px;font-weight:500">{{ doneCount }}</span><span style="font-size:13px;color:#6A6459">уроков пройдено</span></div>
+      <div style="display:flex;flex-direction:column;gap:2px;padding:14px 0 14px 14px;border-left:1px solid #D9D2C4"><span style="font-family:'Literata', Georgia, serif;font-size:30px;font-weight:500">9</span><span style="font-size:13px;color:#6A6459">к повторению</span></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:.12em;color:#6A6459">ПРОВАЙДЕР МОДЕЛЕЙ</span>
+      <div style="display:flex;flex-direction:column;border:1px solid #D9D2C4;border-radius:20px;background:#FBF9F4;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:10px;padding:16px 18px">
+          <span style="font-size:17px;font-weight:700;flex:1">OpenRouter</span>
+          <span style="{{ connChipStyle }}"><span style="{{ connDotStyle }}"></span>{{ connLabel }}</span>
+        </div>
+        <sc-for list="{{ provRows }}" as="r" hint-placeholder-count="3">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 18px;border-top:1px solid #E6E0D4">
+            <span style="font-size:14px;color:#6A6459;flex:1">{{ r.k }}</span>
+            <span style="font-family:'JetBrains Mono', monospace;font-size:13px;text-align:right;white-space:nowrap">{{ r.v }}</span>
+          </div>
+        </sc-for>
+        <button onClick="{{ openSheet }}" style="display:flex;align-items:center;gap:12px;padding:14px 18px;border:none;border-top:1px solid #E6E0D4;background:none;cursor:pointer;text-align:left;color:#1E1C19" style-hover="background:#F1ECE2">
+          <span style="font-size:14px;color:#6A6459;flex:1">Модель</span>
+          <span style="font-size:14px;font-weight:600;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ modelName }}</span>
+          <span class="material-symbols-outlined" style="font-size:20px;color:#6A6459">chevron_right</span>
+        </button>
+      </div>
+      <sc-if value="{{ connected }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ disconnect }}" style="align-self:flex-start;height:44px;padding:0 4px;border:none;background:none;color:#BF3B2A;font-size:15px;font-weight:600;cursor:pointer">Отключить ключ</button>
+      </sc-if>
+      <sc-if value="{{ notConnected }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ goConnect }}" style="height:52px;border:none;border-radius:26px;background:#1E1C19;color:#F4F0E8;font-size:15px;font-weight:600;cursor:pointer" style-hover="background:#3A3630">Подключить ключ OpenRouter</button>
+      </sc-if>
+      <p style="margin:0;font-size:13px;line-height:1.5;color:#6A6459;text-wrap:pretty">Ключ хранится только на этом устройстве. Запросы идут из приложения прямо в OpenRouter, минуя серверы Ergo.</p>
+    </div>
+    <button onClick="{{ replayOnboarding }}" style="align-self:flex-start;height:40px;padding:0;border:none;background:none;color:#1E1C19;font-size:14px;cursor:pointer;text-decoration:underline;text-underline-offset:4px">Пройти знакомство заново</button>
+  </div>
+  </sc-if>
+</div>
+
+<sc-if value="{{ sparActive }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:center;gap:8px;padding:10px 12px 10px 16px;border-top:1px solid #D9D2C4;background:#F4F0E8">
+    <input value="{{ sparInput }}" onChange="{{ onSparInput }}" onKeyDown="{{ onSparKey }}" placeholder="Ваш аргумент…" style="flex:1;min-width:0;height:46px;padding:0 18px;border:1px solid #D9D2C4;border-radius:23px;background:#FBF9F4;outline:none;font-size:15px" style-focus="border-color:#1E1C19">
+    <button onClick="{{ sendSpar }}" style="flex:none;width:46px;height:46px;border:none;border-radius:23px;background:#1E1C19;color:#F4F0E8;cursor:pointer;display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined" style="font-size:20px">arrow_upward</span></button>
+  </div>
+</sc-if>
+
+<div style="display:flex;height:76px;padding:0 4px;background:#ECE6DA;flex:none">
+  <sc-for list="{{ navTabs }}" as="t" hint-placeholder-count="5">
+    <button onClick="{{ t.onClick }}" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;background:none;cursor:pointer;color:#1E1C19;padding:0">
+      <span style="{{ t.pillStyle }}"><span class="material-symbols-outlined" style="{{ t.iconStyle }}">{{ t.icon }}</span></span>
+      <span style="{{ t.labelStyle }}">{{ t.label }}</span>
+    </button>
+  </sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ lessonOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;background:#F4F0E8">
+  <div style="display:flex;align-items:center;gap:12px;padding:8px 20px 8px 10px">
+    <button onClick="{{ closeLesson }}" style="width:44px;height:44px;border:none;background:none;border-radius:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1E1C19" style-hover="background:#E9E3D7"><span class="material-symbols-outlined" style="font-size:24px">close</span></button>
+    <div style="flex:1;display:flex;gap:5px"><sc-for list="{{ lessonBars }}" as="lb" hint-placeholder-count="5"><div style="{{ lb.style }}"></div></sc-for></div>
+  </div>
+  <div style="flex:1;min-height:0;overflow:auto;padding:12px 28px 24px;display:flex;flex-direction:column">
+
+    <sc-if value="{{ ls0 }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:22px">
+        <span style="font-family:'JetBrains Mono', monospace;font-size:12px;letter-spacing:.12em;color:#6A6459">РАЗДЕЛ II · УРОК 2</span>
+        <h1 style="margin:0;font-family:'Literata', Georgia, serif;font-size:48px;font-weight:500;line-height:1;letter-spacing:-.03em">Соломенное чучело</h1>
+        <div style="display:flex;align-items:baseline;gap:14px;font-family:'Literata', Georgia, serif;font-size:60px;line-height:1">
+          <span style="color:#2E58B8">P</span><span style="font-size:30px;color:#6A6459">→</span><span style="color:#BF3B2A;text-decoration:line-through;text-decoration-thickness:3px">P′</span>
+        </div>
+        <p style="margin:0;font-family:'Literata', Georgia, serif;font-size:20px;line-height:1.5;text-wrap:pretty">Подменить настоящий тезис собеседника более слабой версией, опровергнуть её и уйти с видом победителя.</p>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ ls1 }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:22px;padding-top:12px">
+        <span style="font-family:'JetBrains Mono', monospace;font-size:12px;letter-spacing:.12em;color:#6A6459">КАК ЭТО УСТРОЕНО</span>
+        <div style="display:flex;flex-direction:column;border-top:1px solid #D9D2C4">
+          <div style="display:flex;gap:16px;padding:18px 0;border-bottom:1px solid #D9D2C4"><span style="font-family:'Literata', Georgia, serif;font-style:italic;font-size:22px;color:#6A6459;width:20px">1</span><span style="font-size:17px;line-height:1.45">А утверждает <b style="color:#2E58B8">P</b>.</span></div>
+          <div style="display:flex;gap:16px;padding:18px 0;border-bottom:1px solid #D9D2C4"><span style="font-family:'Literata', Georgia, serif;font-style:italic;font-size:22px;color:#6A6459;width:20px">2</span><span style="font-size:17px;line-height:1.45">Б пересказывает это как <b style="color:#BF3B2A">P′</b>: грубее, радикальнее, смешнее.</span></div>
+          <div style="display:flex;gap:16px;padding:18px 0;border-bottom:1px solid #D9D2C4"><span style="font-family:'Literata', Georgia, serif;font-style:italic;font-size:22px;color:#6A6459;width:20px">3</span><span style="font-size:17px;line-height:1.45">Б опровергает <b style="color:#BF3B2A">P′</b> и делает вид, что опроверг <b style="color:#2E58B8">P</b>.</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;padding:16px 18px;border-radius:16px;background:#ECE6DA">
+          <span style="font-family:'JetBrains Mono', monospace;font-size:11px;letter-spacing:.1em;color:#6A6459">ВЫДАЁТ СЕБЯ ФРАЗОЙ</span>
+          <span style="font-family:'Literata', Georgia, serif;font-size:18px;font-style:italic">«То есть на самом деле вы хотите сказать…»</span>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ ls2 }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:18px;padding-top:12px">
+        <span style="font-family:'JetBrains Mono', monospace;font-size:12px;letter-spacing:.12em;color:#6A6459">ПРИМЕР · ГОРОДСКИЕ СЛУШАНИЯ</span>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:13px;font-weight:700;color:#2E58B8">МАША</span>
+          <p style="margin:0;font-family:'Literata', Georgia, serif;font-size:20px;line-height:1.5">Давайте перенесём небольшую часть бюджета на дороги в строительство защищённых велодорожек.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="font-size:13px;font-weight:700;color:#1E1C19">ЛЁША</span>
+          <p style="margin:0;font-family:'Literata', Georgia, serif;font-size:20px;line-height:1.5"><span style="{{ leoMarkStyle }}">То есть вы хотите запретить машины в центре?</span> Удачи довезти продукты домой на велосипеде.</p>
+        </div>
+        <sc-if value="{{ lessonMarked }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:6px;padding:14px 16px;border:1.5px solid #BF3B2A;border-radius:14px;background:#FBF9F4">
+            <span style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:#BF3B2A"><span class="material-symbols-outlined" style="font-size:16px">edit</span>P′ ≠ P</span>
+            <span style="font-size:15px;line-height:1.5">Маша сказала «небольшую часть». Лёша услышал «запретить машины». Всё дальнейшее бьёт по позиции, которой в зале никто не придерживается.</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{ lessonNotMarked }}" hint-placeholder-val="{{ true }}">
+          <span style="font-size:15px;color:#6A6459">Где Лёша подменяет P на P′? Нажмите «Отметить».</span>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ ls3 }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:18px;padding-top:12px">
+        <span style="font-family:'JetBrains Mono', monospace;font-size:12px;letter-spacing:.12em;color:#6A6459">ПРОВЕРКА</span>
+        <h2 style="margin:0;font-family:'Literata', Georgia, serif;font-size:26px;font-weight:500;line-height:1.25;text-wrap:pretty">Какой ответ спорит с тем, что Маша сказала на самом деле?</h2>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <sc-for list="{{ checkOpts }}" as="co" hint-placeholder-count="3">
+            <button onClick="{{ co.onClick }}" style="{{ co.style }}">
+              <span style="font-family:'Literata', Georgia, serif;font-size:17px;line-height:1.45">{{ co.text }}</span>
+              <sc-if value="{{ co.showFb }}" hint-placeholder-val="{{ false }}"><span style="{{ co.fbStyle }}">{{ co.fb }}</span></sc-if>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ ls4 }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:22px">
+        <div style="position:relative;width:64px;height:56px">
+          <div style="position:absolute;left:23px;top:0;width:18px;height:18px;border-radius:50%;background:#BF3B2A"></div>
+          <div style="position:absolute;left:0;bottom:0;width:18px;height:18px;border-radius:50%;background:#1E1C19"></div>
+          <div style="position:absolute;right:0;bottom:0;width:18px;height:18px;border-radius:50%;background:#1E1C19"></div>
+        </div>
+        <h1 style="margin:0;font-family:'Literata', Georgia, serif;font-size:42px;font-weight:500;line-height:1.05;letter-spacing:-.02em">Урок пройден.</h1>
+        <p style="margin:0;font-size:16px;line-height:1.5;color:#5B564D;text-wrap:pretty">«Соломенное чучело» теперь в колоде повторения. Карточка вернётся завтра, а потом всё реже, пока вы отвечаете правильно.</p>
+        <div style="display:flex;gap:8px"><span style="padding:6px 12px;border-radius:14px;background:#1E1C19;color:#F4F0E8;font-family:'JetBrains Mono', monospace;font-size:12px">1 д</span><span style="padding:6px 12px;border-radius:14px;background:#ECE6DA;font-family:'JetBrains Mono', monospace;font-size:12px">3 д</span><span style="padding:6px 12px;border-radius:14px;background:#ECE6DA;font-family:'JetBrains Mono', monospace;font-size:12px">7 д</span><span style="padding:6px 12px;border-radius:14px;background:#ECE6DA;font-family:'JetBrains Mono', monospace;font-size:12px">21 д</span></div>
+        <button onClick="{{ lessonToDrill }}" style="align-self:flex-start;height:44px;padding:0;border:none;background:none;color:#BF3B2A;font-size:15px;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:4px">Потренироваться прямо сейчас</button>
+      </div>
+    </sc-if>
+  </div>
+  <div style="padding:12px 28px 24px">
+    <button onClick="{{ lessonNext }}" style="{{ lessonBtnStyle }}">{{ lessonBtnLabel }}</button>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;justify-content:flex-end">
+  <div onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(30,28,25,.45)"></div>
+  <div style="position:relative;height:80%;display:flex;flex-direction:column;background:#FBF9F4;border-radius:28px 28px 0 0">
+    <div style="display:flex;justify-content:center;padding:12px 0 4px"><div style="width:36px;height:4px;border-radius:2px;background:#C9C1B2"></div></div>
+    <div style="display:flex;flex-direction:column;gap:12px;padding:10px 20px 12px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between">
+        <h3 style="margin:0;font-family:'Literata', Georgia, serif;font-size:24px;font-weight:500">Выбор модели</h3>
+        <span style="font-family:'JetBrains Mono', monospace;font-size:12px;color:#6A6459">{{ modelCount }}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;height:48px;padding:0 16px;border-radius:24px;background:#ECE6DA">
+        <span class="material-symbols-outlined" style="font-size:20px;color:#6A6459">search</span>
+        <input value="{{ modelQuery }}" onChange="{{ onModelQuery }}" placeholder="Поиск по моделям и провайдерам" style="flex:1;min-width:0;border:none;outline:none;background:transparent;font-size:15px">
+      </div>
+      <span style="font-size:13px;color:#6A6459">Цены за 1 млн токенов, ввод / вывод. Данные OpenRouter в реальном времени.</span>
+    </div>
+    <div style="flex:1;min-height:0;overflow:auto;padding:0 8px 20px">
+      <sc-if value="{{ modelsLoading }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:10px;padding:20px 12px;color:#6A6459;font-size:14px">{{ dots }}<span>Загружаем список моделей…</span></div>
+      </sc-if>
+      <sc-for list="{{ modelRows }}" as="mr" hint-placeholder-count="6">
+        <button onClick="{{ mr.onClick }}" style="{{ mr.style }}">
+          <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0">
+            <span style="font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ mr.name }}</span>
+            <span style="font-family:'JetBrains Mono', monospace;font-size:11px;color:#6A6459;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ mr.id }}</span>
+            <span style="font-size:13px;color:#5B564D">{{ mr.detail }}</span>
+          </div>
+          <span class="material-symbols-outlined" style="{{ mr.checkStyle }}">check</span>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;left:16px;right:16px;bottom:92px;z-index:40;padding:14px 18px;border-radius:12px;background:#1E1C19;color:#F4F0E8;font-size:14px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.2)">{{ toast }}</div>
+</sc-if>
+
+</div>
+</x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;onboarding&quot;,&quot;learn&quot;,&quot;lesson&quot;,&quot;drill&quot;,&quot;analyze&quot;,&quot;spar&quot;,&quot;you&quot;],&quot;default&quot;:&quot;onboarding&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Prototype&quot;},&quot;markStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Red pencil&quot;,&quot;Highlighter&quot;],&quot;default&quot;:&quot;Red pencil&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Treatment&quot;},&quot;showCost&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Treatment&quot;}}">
+const SERIF = "'Literata', Georgia, serif";
+const INK = '#1E1C19', RED = '#BF3B2A', BLUE = '#2E58B8', MUTE = '#6A6459', RULE = '#D9D2C4', CARD = '#FBF9F4', REDT = '#F5DED7', BLUET = '#DFE6F4';
+const OR = 'https://openrouter.ai/api/v1';
+
+const UNITS = [
+  { n: 'I', title: 'Анатомия аргумента', lessons: ['Тезисы и выводы', 'Посылки', 'Скрытые допущения', 'Правильность и обоснованность'] },
+  { n: 'II', title: 'Ошибки релевантности', lessons: ['Переход на личности', 'Соломенное чучело', 'Ложный след', 'Апелляция к авторитету', 'Tu quoque («сам такой»)'] },
+  { n: 'III', title: 'Допущения и двусмысленность', lessons: ['Ложная дилемма', 'Предвосхищение основания', 'Скользкая дорожка', 'Эквивокация'] },
+  { n: 'IV', title: 'Индукция и доказательства', lessons: ['Поспешное обобщение', 'Корреляция и причинность', 'Выборочные данные', 'Игнорирование базовой частоты'] },
+  { n: 'V', title: 'Когнитивные искажения', lessons: ['Предвзятость подтверждения', 'Эффект якоря', 'Эвристика доступности'] },
+  { n: 'VI', title: 'Риторика и убеждение', lessons: ['Нагруженная лексика', 'Уклончивые формулировки', 'Фрейминг'] },
+];
+const CUR_LESSON = 'Соломенное чучело';
+
+const DRILLS = [
+  { source: 'Комментарий · форум района Заречье', sentences: ['Новое исследование мэрии говорит, что велодорожки в центре снизили число травм на дорогах на 30%.', 'Но ведущий автор сам каждый день ездит на работу на велосипеде, так что, конечно, он нашёл то, что хотел.', 'Я уж лучше поверю своим глазам.'], flawed: [1], answer: 'Переход на личности', options: ['Соломенное чучело', 'Переход на личности', 'Ложный след', 'Апелляция к авторитету'],
+    explanation: 'Комментатор даже не касается данных. Он бьёт по привычкам исследователя и считает, что из них следует предвзятость. Ездит ли автор на велосипеде, никак не влияет на то, снизились ли травмы на 30%.',
+    whyNot: { 'Соломенное чучело': 'Чучело искажает позицию оппонента. Здесь тезис (минус 30% травм) передан точно. Удар приходится по человеку, а не по позиции.', 'Ложный след': 'Близко: велосипед действительно отвлекает внимание. Но он нацелен именно на то, чтобы дискредитировать источник, поэтому это переход на личности, а не просто смена темы.', 'Апелляция к авторитету': 'Это было бы принятие тезиса потому, что его высказал авторитет. Комментатор делает обратное и отвергает тезис из-за того, кто его высказал.' } },
+  { source: 'Реклама · БАД «ВитаКор»', sentences: ['Устаёте к трём часам дня?', 'В нашем опросе подписчиков «ВитаКор» 9 из 10 сказали, что чувствуют прилив сил.', 'Продаётся во всех аптеках страны.'], flawed: [1], answer: 'Нерепрезентативная выборка', options: ['Апелляция к большинству', 'Апелляция к эмоциям', 'Нерепрезентативная выборка', 'Предвосхищение основания'],
+    explanation: 'Подписку продлевают те, кому продукт уже нравится. Опрос среди них говорит о поклонниках, а не о том, работает ли добавка.',
+    whyNot: { 'Апелляция к большинству': 'Эта ошибка звучит как «все так делают, делай и ты». Реклама же приводит статистику как доказательство. Проблема в том, откуда эта статистика.', 'Апелляция к эмоциям': '«Устаёте к трём часам?» давит на чувства, но вся доказательная нагрузка лежит на опросе. Ошибка именно там.', 'Предвосхищение основания': 'Здесь вывод прячется в посылке. А у нас посылка — правдоподобный опрос, просто по перекошенной группе.' } },
+  { source: 'Колонка · «Вечерний вестник»', sentences: ['Школьный совет хочет разрешить одну пересдачу экзамена в четверть.', 'Разрешите это, и скоро ученики будут требовать переделывать каждое задание.', 'А там и сроки вовсе перестанут что-либо значить.', 'Голосуйте против поправки № 4.'], flawed: [1, 2], answer: 'Скользкая дорожка', options: ['Ложная дилемма', 'Скользкая дорожка', 'Соломенное чучело', 'Поспешное обобщение'],
+    explanation: 'Одну пересдачу в четверть связывают цепочкой с тем, что «сроки ничего не значат», и никак не доказывают, что каждое звено выдерживает. Спуск по склону автор утверждает, но не показывает.',
+    whyNot: { 'Ложная дилемма': 'Ложная дилемма сужает выбор до двух вариантов. Здесь варианты не сужают, а предсказывают ничем не подкреплённую цепочку последствий.', 'Соломенное чучело': 'Соблазнительно: предложение действительно выглядит радикальнее. Но саму политику описали точно, а затем придумали, куда она приведёт. Это и есть дорожка.', 'Поспешное обобщение': 'Это вывод общего правила из слишком малого числа случаев. Здесь случаев нет вообще, только предсказанная цепочка.' } },
+  { source: 'Семейный чат', sentences: ['Либо ты в этом году делаешь прививку от гриппа, либо тебе просто плевать на бабушку.', 'Всё просто.', 'Кстати, ужин в семь!'], flawed: [0, 1], answer: 'Ложная дилемма', options: ['Переход на личности', 'Апелляция к эмоциям', 'Эквивокация', 'Ложная дилемма'],
+    explanation: 'Два варианта подаются как единственные. Можно очень любить бабушку и всё равно иметь причины отложить прививку, в том числе медицинские.',
+    whyNot: { 'Переход на личности': 'Укол в адрес характера есть, но структура другая: «А или Б; не А, значит Б», а все остальные варианты молча вычеркнуты.', 'Апелляция к эмоциям': 'Бабушка, конечно, работает на эмоции. Но логический дефект — навязанное «или-или». Эмоция лишь помогает ему сработать.', 'Эквивокация': 'Эквивокация меняет значение слова по ходу рассуждения. Здесь ни одно слово значения не меняет.' } },
+];
+
+const SAMPLES = [
+  { label: 'Служебная записка', text: 'Удалёнка убивает нашу продуктивность. С тех пор как компания перешла на удалённую работу, квартальная выработка упала на 8%. Все руководители, с которыми я говорил, согласны. Если мы не вернёмся в офис прямо сейчас, то полностью потеряем конкурентное преимущество.',
+    result: { conclusion: 'Компании нужно немедленно вернуться в офис.', premises: ['После перехода на удалёнку квартальная выработка снизилась на 8%.', 'Руководители, с которыми говорил автор, считают, что удалёнка вредит продуктивности.'], assumptions: ['Спад вызван именно удалёнкой, а не рынком, кадрами или сезонностью.', 'Опрошенные руководители — репрезентативная и непредвзятая выборка.'],
+      issues: [{ name: 'Post hoc (корреляция ≠ причина)', quote: 'С тех пор как компания перешла на удалённую работу, квартальная выработка упала на 8%', note: 'Совпадение по времени — не причинность. Всё, что ещё изменилось в том квартале, — альтернативное объяснение.' }, { name: 'Нерепрезентативная выборка', quote: 'Все руководители, с которыми я говорил, согласны', note: 'Выборочный круг руководителей, которым может быть удобнее контролировать людей в офисе, не заменяет данных о выработке.' }, { name: 'Ложная дилемма', quote: 'Если мы не вернёмся в офис прямо сейчас, то полностью потеряем конкурентное преимущество', note: 'Пропущены промежуточные варианты: гибридный график, инструменты, устранение реальной причины спада.' }],
+      verdict: 'Weak', summary: 'Один реальный факт несёт причинный вывод, который не выдерживает, а затем раздувается до ультиматума.' } },
+  { label: 'Пост в районном чате', text: 'Преступность в городе вышла из-под контроля. Только в этом месяце на моей улице было три кражи со взломом. Мэр предпочитает тратить деньги на парки, а не на полицию. Любой, кто за неё голосует, очевидно хочет, чтобы на наших улицах было опасно.',
+    result: { conclusion: 'Не голосуйте за мэра: она проваливает борьбу с преступностью.', premises: ['В этом месяце на улице автора было три кражи со взломом.', 'Мэр финансирует парки, а не полицию.'], assumptions: ['Одна улица за один месяц отражает преступность по всему городу.', 'Главный рычаг против преступности — бюджет полиции, поэтому парки идут в ущерб безопасности.'],
+      issues: [{ name: 'Поспешное обобщение', quote: 'на моей улице было три кражи со взломом', note: 'Одна улица за месяц мало говорит о городе. Значима динамика по всему городу.' }, { name: 'Ложная дилемма', quote: 'предпочитает тратить деньги на парки, а не на полицию', note: 'Бюджет — не меню из двух пунктов, и «парки или полиция» — не реальный выбор, который стоит на повестке.' }, { name: 'Соломенное чучело', quote: 'Любой, кто за неё голосует, очевидно хочет, чтобы на наших улицах было опасно', note: 'Ни один избиратель так не считает. Их настоящие мотивы подменены абсурдным.' }],
+      verdict: 'Weak', summary: 'Яркий случай, навязанный выбор и карикатура на оппонентов подменяют доказательства.' } },
+];
+const VERDICT_RU = { Strong: 'Сильный', Moderate: 'Средний', Weak: 'Слабый' };
+
+const TOPICS = [
+  { motion: 'Соцсети приносят подросткам больше вреда, чем пользы.', opener: 'Я займу противоположную сторону. Большинство подростков говорят, что соцсети помогают им чувствовать связь с другими, а исследования о вреде в основном корреляционные. Какое у вас самое сильное доказательство, что именно соцсети причиняют вред?' },
+  { motion: 'Домашние задания в начальной школе нужно отменить.', opener: 'Я против. Домашка учит детей заниматься без учителя над душой, а родители видят, что проходят в школе. Что заменит эти две вещи?' },
+  { motion: 'Центр города нужно закрыть для машин.', opener: 'Я возражу. Доставка, доступ для людей с инвалидностью и работа мастеров никуда не денутся, если запретить машины. Кто заплатит за ваш план, и вы спросили их мнение?' },
+];
+const SPAR_DEMO = ['Справедливо, но вы слишком многое строите на одном примере. Что бы вы увидели, если бы ошибались?', 'Это предполагает, что ту же пользу нельзя получить иначе. А можно?', 'Допустим, я соглашусь. Это всё равно не показывает, что вред перевешивает пользу, а тезис именно об этом.', 'Вы описали проблему. Я всё ещё жду аргумента, что ваше решение её устраняет.'];
+
+const GOALS = [
+  { id: 'course', title: 'Курс критического мышления', sub: 'Идти в ногу с программой', icon: 'school' },
+  { id: 'online', title: 'Спорить в интернете лучше', sub: 'Замечать нечестные приёмы в тредах', icon: 'forum' },
+  { id: 'news', title: 'Читать новости скептически', sub: 'Утверждения, факты и манипуляции', icon: 'newspaper' },
+  { id: 'curious', title: 'Просто интересно', sub: 'В своём темпе, без спешки', icon: 'explore' },
+];
+
+const CHECK = [
+  { text: '«То есть вы хотите запретить машины? Удачи довезти продукты на велосипеде».', ok: false, fb: 'Снова ход Лёши: тезис сильнее того, что сказала Маша.' },
+  { text: '«Перенос бюджета с дорог может замедлить доставку. Кто-нибудь это посчитал?»', ok: true, fb: 'Да. Ничего не придумано, и ответ давит на реальную цену её предложения.' },
+  { text: '«Типичная велосипедистка. Вы просто ненавидите водителей».', ok: false, fb: 'Не чучело, но и не спор по существу. Это переход на личности из прошлого урока.' },
+];
+
+const FALLACIES = 'Переход на личности, Соломенное чучело, Ложный след, Апелляция к авторитету, Tu quoque, Ложная дилемма, Предвосхищение основания, Скользкая дорожка, Эквивокация, Поспешное обобщение, Post hoc, Выборочные данные, Нерепрезентативная выборка, Апелляция к эмоциям, Апелляция к большинству, Нагруженная лексика, Апелляция к природе, Ошибка композиции';
+const RU = ' Пиши ВСЕ текстовые значения на русском языке; ключи JSON оставь на английском.';
+const SYS_DRILL = `You write practice exercises for an informal-logic learning app for Russian-speaking learners. Return ONLY a JSON object, no prose, no code fences:
+{"source": short label such as "Комментарий · городской форум" or "Реклама · доставка еды" (fictional names only),
+ "sentences": [3-4 short sentences forming ONE realistic snippet: a social post, ad, op-ed excerpt, group chat or review, set in a Russian-speaking context],
+ "flawed": [0-based indices of the sentence(s) containing the flaw],
+ "answer": the fallacy's Russian name,
+ "options": [exactly 4 Russian fallacy names including the answer, with plausible distractors],
+ "explanation": 2 sentences, wry and precise, on why it's that fallacy,
+ "whyNot": {each distractor: one sentence on why it doesn't fit}}
+Exactly one fallacy. Make it subtle and realistic, not cartoonish.` + RU;
+const SYS_AN = `You are an argument analyst in a logic-learning app. Given a passage, extract its structure. Return ONLY a JSON object, no prose, no code fences:
+{"conclusion": string, "premises": [max 4 short paraphrased strings], "assumptions": [max 3 unstated premises the argument needs], "issues": [max 4 {"name": fallacy or weakness name, "quote": EXACT substring copied verbatim from the passage, "note": one or two plain sentences}], "verdict": "Strong" | "Moderate" | "Weak" (keep this value in English), "summary": one sentence}` + RU;
+const sysSpar = (m) => `You are Ergo, a sharp but fair debate opponent in a logic-learning app. Motion: "${m}". The student argues FOR; you argue AGAINST. Keep replies under 70 words, conversational, ending with one pointed question. Then check ONLY the student's latest message for a clear informal fallacy or cognitive bias. Return ONLY JSON: {"reply": string, "flag": null or {"name": Russian fallacy name, "quote": short exact phrase from the student's message, "note": one sentence}}. Flag only clear cases.` + RU;
+
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+const fmtCost = (c) => c == null ? '' : c === 0 ? '$0' : c < 0.01 ? '$' + c.toFixed(5) : '$' + c.toFixed(3);
+const per1M = (p) => { const x = p * 1e6; return x === 0 ? 'бесплатно' : x < 0.1 ? '$' + x.toFixed(3) : '$' + x.toFixed(2); };
+const shuffle = (a) => a.map(v => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map(v => v[1]);
+const plural = (n, one, few, many) => { const a = n % 10, b = n % 100; return a === 1 && b !== 11 ? one : a >= 2 && a <= 4 && (b < 12 || b > 14) ? few : many; };
+const FALLBACK_MODELS = [
+  { id: 'openrouter/auto', name: 'Автовыбор', ctx: null, pin: -1, pout: -1 },
+  { id: 'anthropic/claude-sonnet-4.5', name: 'Anthropic: Claude Sonnet 4.5', ctx: 200000, pin: 3e-6, pout: 15e-6 },
+  { id: 'google/gemini-2.5-flash', name: 'Google: Gemini 2.5 Flash', ctx: 1048576, pin: 3e-7, pout: 25e-7 },
+  { id: 'openai/gpt-4o-mini', name: 'OpenAI: GPT-4o-mini', ctx: 128000, pin: 15e-8, pout: 6e-7 },
+  { id: 'meta-llama/llama-3.3-70b-instruct', name: 'Meta: Llama 3.3 70B Instruct', ctx: 131072, pin: 1e-7, pout: 3e-7 },
+];
+
+function demoFlag(t) {
+  const tests = [
+    [/то есть (?:вы|ты) (?:хоти|счита|говори)[^.?!]*/i, 'Соломенное чучело', 'Это пересказ моей позиции в более сильной форме, чем я её высказал.'],
+    [/(?:^|\s)(?:типичн\S*|(?:вы|ты) просто)[^.?!]*/i, 'Переход на личности', 'Удар по человеку, а не по аргументу.'],
+    [/(?:либо|или)[^.?!]*(?:либо|или)[^.?!]*/i, 'Ложная дилемма', 'Точно ли вариантов только два?'],
+    [/(?:^|\s)(?:все|всегда|никогда|каждый|никто)(?=\s|[,.!?]|$)[^.?!]*/i, 'Поспешное обобщение', 'Слишком широкий квантор. Сможете защитить «все», или хватит «многие»?'],
+    [/если (?:мы|это)[^.?!]*(?:скоро|рано или поздно|в итоге|а там)[^.?!]*/i, 'Скользкая дорожка', 'Каждое звено этой цепочки нуждается в собственном обосновании.'],
+  ];
+  for (const [re, name, note] of tests) { const m = t.match(re); if (m) return { name, quote: m[0].trim().slice(0, 90), note }; }
+  return null;
+}
+
+class Component extends DCLogic {
+  mainRef = React.createRef();
+  state = {
+    screen: 'onboarding', obStep: 0, goal: null, tab: 'learn', openUnit: 1, strawDone: false,
+    lessonOpen: false, lessonStep: 0, lessonMarked: false, lessonAns: null,
+    apiKey: '', keyInput: '', keyStatus: 'idle', keyInfo: null, keyError: '',
+    model: 'openrouter/auto', models: [], modelsLoading: false, modelQuery: '', sheetOpen: false,
+    calls: 0, cost: 0,
+    drillIdx: 0, drill: DRILLS[0], drillPhase: 'spot', drillSpot: null, drillMiss: [], drillPick: null, drillExplain: '', drillExplainMeta: '', drillExplainLoading: false, genLoading: false, score: { r: 0, t: 0 },
+    anText: '', anSource: '', anResult: null, anLoading: false, anMeta: '',
+    sparTopic: null, sparMsgs: [], sparInput: '', sparLoading: false, sparI: 0,
+    toast: '',
+  };
+
+  componentDidMount() {
+    let key = '', model = null;
+    try { key = localStorage.getItem('ergo.orKey') || ''; model = localStorage.getItem('ergo.orModel'); } catch (e) {}
+    this.setState({ apiKey: key, keyInput: key, model: model || 'openrouter/auto' });
+    if (key) this.fetchKeyInfo(key).catch(() => {});
+    this.applyStart(this.props.startScreen);
+  }
+  componentDidUpdate(prev, prevState) {
+    if (prev.startScreen !== this.props.startScreen) this.applyStart(this.props.startScreen);
+    if (prevState.sparMsgs.length !== this.state.sparMsgs.length || prevState.sparLoading !== this.state.sparLoading) {
+      const el = this.mainRef.current; if (el && this.state.tab === 'spar') el.scrollTop = el.scrollHeight;
+    }
+  }
+  applyStart(s) {
+    s = s || 'onboarding';
+    if (s === 'onboarding') return this.setState({ screen: 'onboarding', obStep: 0, lessonOpen: false });
+    if (s === 'lesson') return this.setState({ screen: 'app', tab: 'learn', lessonOpen: true, lessonStep: 0, lessonMarked: false, lessonAns: null });
+    this.setState({ screen: 'app', tab: s, lessonOpen: false });
+  }
+  showToast(msg) { clearTimeout(this._t); this.setState({ toast: msg }); this._t = setTimeout(() => this.setState({ toast: '' }), 3200); }
+  go(tab) { this.setState({ tab, screen: 'app' }); const el = this.mainRef.current; if (el) el.scrollTop = 0; }
+
+  async fetchKeyInfo(k) {
+    const r = await fetch(OR + '/key', { headers: { Authorization: 'Bearer ' + k } });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error((j.error && j.error.message) || 'HTTP ' + r.status);
+    this.setState({ keyInfo: j.data || {} });
+    return j.data || {};
+  }
+  async verifyKey() {
+    const k = this.state.keyInput.trim();
+    if (!/^sk-or-/.test(k)) return this.setState({ keyStatus: 'error', keyError: 'Ключи OpenRouter начинаются с «sk-or-». Проверьте, что скопировали ключ целиком.' });
+    this.setState({ keyStatus: 'checking', keyError: '' });
+    try {
+      await this.fetchKeyInfo(k);
+      try { localStorage.setItem('ergo.orKey', k); } catch (e) {}
+      this.setState({ apiKey: k, keyStatus: 'ok' });
+    } catch (e) { this.setState({ keyStatus: 'error', keyError: 'OpenRouter отклонил ключ: ' + e.message }); }
+  }
+  async loadModels() {
+    if (this.state.models.length || this.state.modelsLoading) return;
+    this.setState({ modelsLoading: true });
+    try {
+      const r = await fetch(OR + '/models'); const j = await r.json();
+      let ms = (j.data || []).map(m => ({ id: m.id, name: m.name || m.id, ctx: m.context_length, pin: +(m.pricing && m.pricing.prompt) || 0, pout: +(m.pricing && m.pricing.completion) || 0 }));
+      ms = ms.filter(m => m.id !== 'openrouter/auto');
+      this.setState({ models: [FALLBACK_MODELS[0], ...ms], modelsLoading: false });
+    } catch (e) { this.setState({ models: FALLBACK_MODELS, modelsLoading: false }); this.showToast('Не удалось связаться с OpenRouter, показан офлайн-список.'); }
+  }
+  async chat(messages, max = 700) {
+    const res = await fetch(OR + '/chat/completions', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + this.state.apiKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: this.state.model, messages, max_tokens: max, temperature: 0.8, usage: { include: true } }),
+    });
+    const j = await res.json().catch(() => ({}));
+    if (!res.ok || j.error) throw new Error((j.error && j.error.message) || 'HTTP ' + res.status);
+    const text = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '';
+    const cost = j.usage && typeof j.usage.cost === 'number' ? j.usage.cost : null;
+    this.setState(s => ({ calls: s.calls + 1, cost: s.cost + (cost || 0) }));
+    const show = this.props.showCost ?? true;
+    return { text, meta: (j.model || this.state.model) + (show && cost != null ? ' · ' + fmtCost(cost) : '') };
+  }
+  parseJSON(t) { const m = t.replace(/```json|```/g, '').match(/\{[\s\S]*\}/); return JSON.parse(m ? m[0] : t); }
+
+  resetDrill(d, i) { return { drill: d, drillIdx: i != null ? i : this.state.drillIdx, drillPhase: 'spot', drillSpot: null, drillMiss: [], drillPick: null, drillExplain: '', drillExplainMeta: '', drillExplainLoading: false }; }
+  spot(i) {
+    const s = this.state; if (s.drillPhase !== 'spot') return;
+    if (s.drill.flawed.includes(i)) this.setState({ drillSpot: i, drillPhase: 'name' });
+    else if (!s.drillMiss.includes(i)) this.setState({ drillMiss: [...s.drillMiss, i] });
+  }
+  pick(name) {
+    const s = this.state; if (s.drillPhase !== 'name') return;
+    const ok = name === s.drill.answer;
+    this.setState({ drillPick: name, drillPhase: 'result', score: { r: s.score.r + (ok ? 1 : 0), t: s.score.t + 1 } });
+  }
+  nextDrill() { const i = (this.state.drillIdx + 1) % DRILLS.length; this.setState(this.resetDrill(DRILLS[i], i)); const el = this.mainRef.current; if (el) el.scrollTop = 0; }
+  async genDrill() {
+    if (!this.state.apiKey) return this.showToast('Для новых упражнений нужен ключ OpenRouter. Добавьте его в профиле.');
+    if (this.state.genLoading) return;
+    this.setState({ genLoading: true });
+    try {
+      const { text, meta } = await this.chat([{ role: 'system', content: SYS_DRILL }, { role: 'user', content: `Новое упражнение. Выбери одну ошибку случайно из списка: ${FALLACIES}. Не используй: ${this.state.drill.answer}.` }]);
+      const o = this.parseJSON(text);
+      let flawed = Array.isArray(o.flawed) ? o.flawed : [o.flawed];
+      let opts = Array.isArray(o.options) ? o.options.slice(0, 4) : [];
+      if (!opts.includes(o.answer)) opts = [o.answer, ...opts].slice(0, 4);
+      if (!Array.isArray(o.sentences) || !o.sentences.length) throw new Error('модель вернула неожиданный формат');
+      this.setState({ ...this.resetDrill({ source: o.source || 'Сгенерированный фрагмент', sentences: o.sentences, flawed: flawed.map(Number), answer: o.answer, options: shuffle(opts), explanation: o.explanation, whyNot: o.whyNot || {}, ai: true, meta }), genLoading: false });
+    } catch (e) { this.setState({ genLoading: false }); this.showToast('Не удалось сгенерировать: ' + e.message); }
+  }
+  async explainWrong() {
+    const s = this.state, d = s.drill; if (s.drillExplainLoading) return;
+    this.setState({ drillExplainLoading: true, drillExplain: '' });
+    if (!s.apiKey) {
+      await sleep(800);
+      return this.setState({ drillExplainLoading: false, drillExplain: (d.whyNot && d.whyNot[s.drillPick]) || d.explanation, drillExplainMeta: 'Демо-объяснение. Подключите OpenRouter, чтобы получить персональное.' });
+    }
+    try {
+      const { text, meta } = await this.chat([
+        { role: 'system', content: 'Ты Ergo — остроумный наставник по неформальной логике в сократовском духе. Только простой текст на русском, не больше 80 слов, без вступлений.' },
+        { role: 'user', content: `Фрагмент: «${d.sentences.join(' ')}»\nОшибочная часть: «${d.flawed.map(i => d.sentences[i]).join(' ')}»\nПравильный ответ: ${d.answer}\nУченик выбрал: ${s.drillPick}\nОбъясни, почему «${s.drillPick}» не подходит и что выдаёт «${d.answer}». Закончи одним коротким вопросом, который проверяет разницу.` },
+      ], 300);
+      this.setState({ drillExplainLoading: false, drillExplain: text.trim(), drillExplainMeta: meta });
+    } catch (e) { this.setState({ drillExplainLoading: false }); this.showToast('Не удалось получить объяснение: ' + e.message); }
+  }
+
+  async analyze() {
+    const s = this.state, text = s.anText.trim();
+    if (s.anLoading) return;
+    if (text.length < 40) return this.showToast('Дайте Ergo хотя бы пару предложений.');
+    this.setState({ anLoading: true, anResult: null });
+    if (!s.apiKey) {
+      await sleep(1100);
+      const sm = SAMPLES.find(x => x.text === text);
+      if (sm) return this.setState({ anLoading: false, anResult: sm.result, anSource: text, anMeta: 'Демо-карта. Подключите OpenRouter, чтобы разбирать свои тексты.' });
+      this.setState({ anLoading: false });
+      return this.showToast('В демо-режиме разбираются только примеры. Подключите OpenRouter для своих текстов.');
+    }
+    try {
+      const { text: out, meta } = await this.chat([{ role: 'system', content: SYS_AN }, { role: 'user', content: text }], 900);
+      const o = this.parseJSON(out);
+      this.setState({ anLoading: false, anResult: { conclusion: o.conclusion || '—', premises: o.premises || [], assumptions: o.assumptions || [], issues: o.issues || [], verdict: o.verdict || 'Moderate', summary: o.summary || '' }, anSource: text, anMeta: 'Разобрано моделью ' + meta });
+    } catch (e) { this.setState({ anLoading: false }); this.showToast('Анализ не удался: ' + e.message); }
+  }
+
+  async sendSpar() {
+    const s = this.state, txt = s.sparInput.trim();
+    if (!txt || s.sparLoading) return;
+    const msgs = [...s.sparMsgs, { role: 'me', text: txt }];
+    this.setState({ sparMsgs: msgs, sparInput: '', sparLoading: true });
+    let reply, flag;
+    try {
+      if (!s.apiKey) { await sleep(1100); reply = SPAR_DEMO[s.sparI % SPAR_DEMO.length]; flag = demoFlag(txt); }
+      else {
+        const hist = msgs.map(m => ({ role: m.role === 'me' ? 'user' : 'assistant', content: m.text }));
+        const { text } = await this.chat([{ role: 'system', content: sysSpar(s.sparTopic.motion) }, ...hist], 400);
+        try { const o = this.parseJSON(text); reply = o.reply; flag = o.flag && o.flag.name ? o.flag : null; } catch (e) { reply = text; flag = null; }
+      }
+    } catch (e) { this.setState({ sparLoading: false }); return this.showToast('Ergo не смог ответить: ' + e.message); }
+    this.setState(st => {
+      const m2 = st.sparMsgs.slice(); const last = { ...m2[m2.length - 1], flag }; m2[m2.length - 1] = last;
+      return { sparMsgs: [...m2, { role: 'ai', text: reply }], sparLoading: false, sparI: st.sparI + 1 };
+    });
+  }
+
+  lessonNext() {
+    const s = this.state;
+    if (s.lessonStep === 2 && !s.lessonMarked) return this.setState({ lessonMarked: true });
+    if (s.lessonStep === 3 && !(s.lessonAns != null && CHECK[s.lessonAns].ok)) return;
+    if (s.lessonStep === 4) return this.setState({ lessonOpen: false, strawDone: true, lessonStep: 0 });
+    this.setState({ lessonStep: s.lessonStep + 1 });
+  }
+  openLesson() { this.setState({ lessonOpen: true, lessonStep: 0, lessonMarked: false, lessonAns: null }); }
+
+  renderVals() {
+    const s = this.state, p = this.props;
+    const hl = (p.markStyle || 'Red pencil') === 'Highlighter';
+    const markSt = hl ? { background: REDT, boxShadow: '0 0 0 3px ' + REDT, borderRadius: '3px', WebkitBoxDecorationBreak: 'clone', boxDecorationBreak: 'clone' }
+      : { textDecorationLine: 'underline', textDecorationStyle: 'wavy', textDecorationColor: RED, textDecorationThickness: '1.5px', textUnderlineOffset: '6px', textDecorationSkipInk: 'none' };
+    const connected = !!s.apiKey;
+    const pillBtn = (on) => ({ height: '56px', border: 'none', borderRadius: '28px', background: on ? INK : '#D6CFC2', color: on ? '#F4F0E8' : '#8A8376', fontSize: '16px', fontWeight: 600, cursor: on ? 'pointer' : 'default' });
+    const dots = React.createElement('span', { style: { display: 'inline-flex', gap: 4 } }, [0, 1, 2].map(i => React.createElement('span', { key: i, style: { width: 6, height: 6, borderRadius: 3, background: 'currentColor', animation: `ergoPulse 1s ${i * 0.15}s infinite` } })));
+
+    const doneCount = 5 + (s.strawDone ? 1 : 0);
+    let flat = 0;
+    const units = UNITS.map((u, ui) => {
+      const lessons = u.lessons.map((name) => {
+        const idx = flat++;
+        const st = idx < doneCount ? 'done' : idx === doneCount ? 'current' : 'locked';
+        const onClick = () => {
+          if (name === CUR_LESSON && st !== 'locked') return this.openLesson();
+          if (st === 'current') return this.showToast(`Урока «${name}» пока нет в прототипе. Пример урока — «Соломенное чучело».`);
+          if (st === 'done') return this.showToast('Пройденные уроки возвращаются через колоду повторения.');
+          this.showToast('Закрыто. Сначала пройдите текущий урок.');
+        };
+        return { name, meta: (3 + (idx % 3)) + ' мин', onClick,
+          icon: st === 'done' ? 'check_circle' : st === 'current' ? 'radio_button_checked' : 'lock',
+          iconStyle: { fontSize: '20px', color: st === 'done' ? BLUE : st === 'current' ? RED : '#A9A194', fontVariationSettings: st === 'done' ? "'FILL' 1" : "'FILL' 0" },
+          nameStyle: { flex: 1, fontSize: '15px', fontWeight: st === 'current' ? 700 : 500, color: st === 'locked' ? '#8A8376' : INK }, st };
+      });
+      const d = lessons.filter(l => l.st === 'done').length, cur = lessons.some(l => l.st === 'current');
+      const open = s.openUnit === ui;
+      return { n: u.n, title: u.title, lessons, open, meta: d === lessons.length ? 'Пройден' : cur ? `${d} из ${lessons.length} · в процессе` : `${lessons.length} ${plural(lessons.length, 'урок', 'урока', 'уроков')}`,
+        numStyle: { flex: 'none', width: '36px', fontFamily: SERIF, fontStyle: 'italic', fontSize: '24px', color: cur ? RED : d === lessons.length ? BLUE : '#A9A194' },
+        chevStyle: { fontSize: '22px', color: MUTE, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .2s' },
+        toggle: () => this.setState({ openUnit: open ? -1 : ui }) };
+    });
+
+    const d = s.drill;
+    const drillSents = d.sentences.map((t, i) => {
+      const found = s.drillSpot != null && d.flawed.includes(i) && (s.drillSpot === i || s.drillPhase === 'result');
+      const miss = s.drillMiss.includes(i);
+      const base = { cursor: s.drillPhase === 'spot' ? 'pointer' : 'default', borderRadius: '4px', transition: 'color .2s' };
+      return { text: t, onClick: () => this.spot(i), style: found ? { ...base, ...markSt } : miss ? { ...base, color: '#A9A194', textDecorationLine: 'line-through', textDecorationColor: '#A9A194' } : base };
+    });
+    const phases = ['spot', 'name', 'result'];
+    const pi = phases.indexOf(s.drillPhase);
+    const drillSteps = ['Найти', 'Назвать', 'Понять'].map((label, i) => ({ n: i + 1, label, style: { display: 'flex', alignItems: 'center', gap: '6px', height: '30px', padding: '0 12px', borderRadius: '15px', fontSize: '13px', fontWeight: 600, whiteSpace: 'nowrap',
+      background: i === pi ? INK : i < pi ? '#ECE6DA' : 'transparent', color: i === pi ? '#F4F0E8' : i < pi ? INK : '#8A8376', border: i > pi ? '1px solid ' + RULE : '1px solid transparent' } }));
+    const correct = s.drillPick === d.answer;
+    const drillOptions = d.options.map(name => {
+      const res = s.drillPhase === 'result';
+      const isAns = name === d.answer, isPick = name === s.drillPick;
+      const st = { minHeight: '52px', padding: '10px 12px', borderRadius: '14px', fontSize: '14px', lineHeight: '1.3', fontWeight: 600, cursor: res ? 'default' : 'pointer', textAlign: 'center', border: '1.5px solid ' + RULE, background: CARD, color: INK };
+      if (res && isAns) Object.assign(st, { borderColor: BLUE, background: BLUET, color: BLUE });
+      else if (res && isPick) Object.assign(st, { borderColor: RED, background: REDT, color: RED });
+      else if (res) Object.assign(st, { color: '#A9A194' });
+      return { name, style: st, onClick: () => this.pick(name) };
+    });
+    const hint = s.drillPhase === 'spot' ? (s.drillMiss.length ? 'С этим предложением всё в порядке. Попробуйте другое.' : 'Нажмите на предложение, где рассуждение ломается.') : s.drillPhase === 'name' ? 'Зоркий глаз. Так что с ним не так?' : '';
+
+    const an = s.anResult;
+    let anSegs = [], anIssues = [];
+    if (an) {
+      const text = s.anSource; const marks = [];
+      (an.issues || []).forEach((is, i) => { const q = (is.quote || '').trim(); if (!q) return; let at = text.indexOf(q); if (at < 0) at = text.toLowerCase().indexOf(q.toLowerCase()); if (at >= 0) marks.push({ s: at, e: at + q.length, n: i + 1 }); });
+      marks.sort((a, b) => a.s - b.s); let pos = 0;
+      marks.forEach(m => { if (m.s < pos) return; if (m.s > pos) anSegs.push({ t: text.slice(pos, m.s), marked: false, style: {} }); anSegs.push({ t: text.slice(m.s, m.e), marked: true, n: m.n, style: markSt }); pos = m.e; });
+      if (pos < text.length) anSegs.push({ t: text.slice(pos), marked: false, style: {} });
+      anIssues = (an.issues || []).map((is, i) => ({ n: i + 1, name: is.name, note: is.note }));
+    }
+    const vScore = an ? ({ Strong: 3, Moderate: 2, Weak: 1 }[an.verdict] || 2) : 0;
+
+    const cur = s.models.find(m => m.id === s.model) || FALLBACK_MODELS.find(m => m.id === s.model);
+    const modelName = s.model === 'openrouter/auto' ? 'Автовыбор' : cur ? cur.name : s.model;
+    const q = s.modelQuery.trim().toLowerCase();
+    const modelRows = s.models.filter(m => !q || m.id.toLowerCase().includes(q) || m.name.toLowerCase().includes(q)).slice(0, 80).map(m => {
+      const sel = m.id === s.model;
+      return { id: m.id, name: m.id === 'openrouter/auto' ? 'Автовыбор (рекомендуем)' : m.name,
+        detail: m.id === 'openrouter/auto' ? 'Подбирает модель под каждый запрос · цена меняется' : `${per1M(m.pin)} / ${per1M(m.pout)}${m.ctx ? ' · контекст ' + Math.round(m.ctx / 1000) + 'K' : ''}`,
+        style: { width: '100%', display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', border: 'none', borderRadius: '14px', background: sel ? '#ECE6DA' : 'transparent', cursor: 'pointer', textAlign: 'left', color: INK },
+        checkStyle: { fontSize: '20px', color: INK, opacity: sel ? 1 : 0 },
+        onClick: () => { try { localStorage.setItem('ergo.orModel', m.id); } catch (e) {} this.setState({ model: m.id, sheetOpen: false }); this.showToast('Выбрана модель: ' + (m.id === 'openrouter/auto' ? 'Автовыбор' : m.name) + '.'); } };
+    });
+
+    const ki = s.keyInfo || {};
+    const money = (v) => v == null ? '—' : '$' + Number(v).toFixed(2);
+    const showCost = p.showCost ?? true;
+    const provRows = connected ? [
+      { k: 'Ключ', v: s.apiKey.slice(0, 9) + '…' + s.apiKey.slice(-4) },
+      ...(ki.label ? [{ k: 'Метка', v: ki.label.length > 22 ? ki.label.slice(0, 22) + '…' : ki.label }] : []),
+      { k: 'Потрачено по ключу', v: money(ki.usage) },
+      { k: 'Остаток лимита', v: ki.limit_remaining == null ? (ki.limit == null ? 'Без лимита' : '—') : money(ki.limit_remaining) },
+      ...(showCost ? [{ k: 'Эта сессия', v: `${s.calls} ${plural(s.calls, 'запрос', 'запроса', 'запросов')} · ${fmtCost(s.cost)}` }] : []),
+    ] : [{ k: 'Статус', v: 'Демо-контент' }];
+
+    const sparActive = s.tab === 'spar' && !!s.sparTopic;
+    const flagN = s.sparMsgs.filter(m => m.flag).length;
+    const tabs = [['learn', 'Учёба', 'menu_book'], ['drill', 'Практика', 'bolt'], ['analyze', 'Анализ', 'account_tree'], ['spar', 'Спор', 'forum'], ['you', 'Профиль', 'person']];
+
+    return {
+      dots,
+      isOnboarding: s.screen === 'onboarding', isApp: s.screen === 'app',
+      ob0: s.obStep === 0, ob1: s.obStep === 1, ob2: s.obStep === 2, obShowBack: s.obStep > 0,
+      obBars: [0, 1, 2].map(i => ({ style: { width: i === s.obStep ? '22px' : '8px', height: '8px', borderRadius: '4px', background: i <= s.obStep ? INK : '#D0C8B9', transition: 'width .25s' } })),
+      obBack: () => this.setState({ obStep: Math.max(0, s.obStep - 1) }),
+      obNext: () => { if (s.obStep === 1 && !s.goal) return; this.setState({ obStep: s.obStep + 1 }); },
+      obContinueStyle: pillBtn(!!s.goal),
+      goals: GOALS.map(g => { const on = s.goal === g.id; return { ...g, onClick: () => this.setState({ goal: g.id }),
+        style: { display: 'flex', alignItems: 'center', gap: '14px', padding: '16px 18px', borderRadius: '18px', cursor: 'pointer', color: INK, border: '1.5px solid ' + (on ? INK : RULE), background: on ? CARD : 'transparent' },
+        iconStyle: { fontSize: '24px', color: on ? RED : MUTE } }; }),
+      keyInput: s.keyInput, onKeyInput: (e) => this.setState({ keyInput: e.target.value, keyStatus: s.keyStatus === 'ok' ? 'idle' : s.keyStatus }),
+      keyFieldStyle: { display: 'flex', alignItems: 'center', gap: '10px', height: '56px', padding: '0 8px 0 16px', borderRadius: '16px', background: CARD, border: '1.5px solid ' + (s.keyStatus === 'error' ? RED : s.keyStatus === 'ok' ? BLUE : RULE) },
+      verifyKey: () => this.verifyKey(), verifyLabel: s.keyStatus === 'checking' ? 'Проверяем…' : s.keyStatus === 'ok' ? 'Проверен' : 'Проверить',
+      keyOk: s.keyStatus === 'ok', keyErr: s.keyStatus === 'error', keyError: s.keyError,
+      keyOkText: 'Ключ работает' + (ki.label ? ` · «${ki.label}»` : '') + (ki.limit_remaining != null ? ` · осталось ${money(ki.limit_remaining)}` : ''),
+      startStyle: pillBtn(s.keyStatus === 'ok'),
+      finishOnboarding: () => { if (s.keyStatus !== 'ok') return this.showToast('Сначала проверьте ключ или перейдите в демо-режим.'); this.go('learn'); },
+      skipDemo: () => { this.go('learn'); this.showToast('Демо-режим: только встроенный контент. Ключ можно добавить в профиле.'); },
+      model: s.model, modelName, openSheet: () => { this.setState({ sheetOpen: true }); this.loadModels(); }, closeSheet: () => this.setState({ sheetOpen: false }),
+      sheetOpen: s.sheetOpen, modelsLoading: s.modelsLoading, modelRows, modelQuery: s.modelQuery, onModelQuery: (e) => this.setState({ modelQuery: e.target.value }),
+      modelCount: s.models.length ? s.models.length + ' ' + plural(s.models.length, 'модель', 'модели', 'моделей') : '',
+      mainRef: this.mainRef,
+      tabLearn: s.tab === 'learn', tabDrill: s.tab === 'drill', tabAnalyze: s.tab === 'analyze', tabSpar: s.tab === 'spar', tabYou: s.tab === 'you',
+      navTabs: tabs.map(([id, label, icon]) => { const on = s.tab === id; return { label, icon, onClick: () => this.go(id),
+        pillStyle: { width: '60px', height: '32px', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: on ? '#1E1C19' : 'transparent', color: on ? '#F4F0E8' : INK, transition: 'background .2s' },
+        iconStyle: { fontSize: '22px', fontVariationSettings: on ? "'FILL' 1" : "'FILL' 0" },
+        labelStyle: { fontSize: '12px', fontWeight: on ? 700 : 500, color: on ? INK : '#5B564D', whiteSpace: 'nowrap' } }; }),
+      contKicker: s.strawDone ? 'РАЗДЕЛ II · УРОК 3 ИЗ 5' : 'РАЗДЕЛ II · УРОК 2 ИЗ 5',
+      contTitle: s.strawDone ? 'Ложный след' : 'Соломенное чучело',
+      contSub: s.strawDone ? 'Сменить тему, но убедительно.' : 'Опровергнуть то, чего никто не утверждал.',
+      continueLesson: () => s.strawDone ? this.showToast('Урока «Ложный след» пока нет в прототипе. Загляните в «Практику».') : this.openLesson(),
+      goReview: () => this.go('drill'), doneCount, units,
+      drill: d, drillSents, drillSteps, drillOptions, drillHint: hint,
+      drillHintStyle: { fontSize: '15px', color: s.drillMiss.length && s.drillPhase === 'spot' ? RED : '#5B564D', minHeight: hint ? '20px' : '0', display: hint ? 'block' : 'none' },
+      drillShowOptions: s.drillPhase !== 'spot', drillIsResult: s.drillPhase === 'result',
+      verdictText: correct ? `Верно: ${d.answer.toLowerCase()}.` : `Не совсем. Это ${d.answer.toLowerCase()}.`, verdictIcon: correct ? 'check' : 'close',
+      verdictStyle: { display: 'flex', alignItems: 'flex-start', gap: '8px', fontFamily: SERIF, fontSize: '22px', lineHeight: '1.25', fontWeight: 500, color: correct ? BLUE : RED },
+      canAskWhy: s.drillPhase === 'result' && !correct && !s.drillExplain && !s.drillExplainLoading, whyLabel: `Почему не «${(s.drillPick || '').toLowerCase()}»?`,
+      explainWrong: () => this.explainWrong(), drillExplainLoading: s.drillExplainLoading, hasExplain: !!s.drillExplain, drillExplain: s.drillExplain, drillExplainMeta: s.drillExplainMeta,
+      drillPickUpper: (s.drillPick || '').toUpperCase(),
+      nextDrill: () => this.nextDrill(), genDrill: () => this.genDrill(), genLabel: s.genLoading ? 'Пишем…' : 'Сгенерировать',
+      drillMetaShow: !!(d.ai && d.meta), drillMeta: d.meta ? 'Сгенерировано: ' + d.meta : '',
+      drillScoreText: s.score.t ? `${s.score.r} из ${s.score.t} сегодня` : 'Разделы I–III',
+      anText: s.anText, onAnText: (e) => this.setState({ anText: e.target.value }),
+      samples: SAMPLES.map(sm => ({ label: sm.label, onClick: () => this.setState({ anText: sm.text }) })),
+      analyze: () => this.analyze(), anLoading: s.anLoading, anLabel: s.anLoading ? 'Разбираем…' : 'Разобрать аргумент',
+      anHas: !!an, an: an || {}, anSegs, anIssues, anMeta: s.anMeta, anVerdict: an ? (VERDICT_RU[an.verdict] || an.verdict) + ' аргумент' : '',
+      anPremises: an ? an.premises.map((t, i) => ({ id: 'P' + (i + 1), text: t })) : [],
+      anAssumptions: an ? an.assumptions.map((t, i) => ({ id: 'A' + (i + 1), text: t })) : [],
+      anDots: [1, 2, 3].map(i => ({ style: { width: '10px', height: '10px', borderRadius: '5px', background: i <= vScore ? (vScore === 1 ? '#E0705E' : vScore === 3 ? '#8FB0F0' : '#F4F0E8') : 'rgba(244,240,232,.2)' } })),
+      sparPicking: !s.sparTopic, sparActive,
+      topics: TOPICS.map(t => ({ motion: t.motion, onClick: () => this.setState({ sparTopic: t, sparMsgs: [{ role: 'ai', text: t.opener }], sparI: 0 }) })),
+      endSpar: () => this.setState({ sparTopic: null, sparMsgs: [] }),
+      sparMotion: s.sparTopic ? s.sparTopic.motion : '',
+      sparFlagCount: flagN + ' ' + plural(flagN, 'ошибка', 'ошибки', 'ошибок'),
+      sparMsgs: s.sparMsgs.map(m => ({ text: m.text, isAi: m.role === 'ai', isMe: m.role === 'me', hasFlag: !!m.flag, flagName: m.flag ? m.flag.name : '', flagQuote: m.flag ? m.flag.quote : '', flagNote: m.flag ? m.flag.note : '' })),
+      sparLoading: s.sparLoading, sparInput: s.sparInput, onSparInput: (e) => this.setState({ sparInput: e.target.value }),
+      onSparKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); this.sendSpar(); } }, sendSpar: () => this.sendSpar(),
+      connected, notConnected: !connected, provRows,
+      connLabel: connected ? 'Подключён' : 'Демо-режим',
+      connChipStyle: { display: 'flex', alignItems: 'center', gap: '6px', height: '26px', padding: '0 10px', borderRadius: '13px', fontSize: '12px', fontWeight: 700, whiteSpace: 'nowrap', background: connected ? BLUET : '#ECE6DA', color: connected ? BLUE : MUTE },
+      connDotStyle: { width: '7px', height: '7px', borderRadius: '4px', background: connected ? BLUE : '#A9A194' },
+      disconnect: () => { try { localStorage.removeItem('ergo.orKey'); } catch (e) {} this.setState({ apiKey: '', keyInput: '', keyStatus: 'idle', keyInfo: null }); this.showToast('Ключ удалён с этого устройства.'); },
+      goConnect: () => this.setState({ screen: 'onboarding', obStep: 2 }),
+      replayOnboarding: () => this.setState({ screen: 'onboarding', obStep: 0 }),
+      lessonOpen: s.lessonOpen, closeLesson: () => this.setState({ lessonOpen: false }),
+      lessonBars: [0, 1, 2, 3, 4].map(i => ({ style: { flex: 1, height: '4px', borderRadius: '2px', background: i <= s.lessonStep ? INK : '#D6CFC2', transition: 'background .25s' } })),
+      ls0: s.lessonStep === 0, ls1: s.lessonStep === 1, ls2: s.lessonStep === 2, ls3: s.lessonStep === 3, ls4: s.lessonStep === 4,
+      lessonMarked: s.lessonMarked, lessonNotMarked: !s.lessonMarked,
+      leoMarkStyle: s.lessonMarked ? markSt : {},
+      checkOpts: CHECK.map((c, i) => { const sel = s.lessonAns === i; return { text: c.text, fb: c.fb, showFb: sel, onClick: () => this.setState({ lessonAns: i }),
+        style: { display: 'flex', flexDirection: 'column', gap: '8px', padding: '16px 18px', borderRadius: '16px', cursor: 'pointer', textAlign: 'left', color: INK, border: '1.5px solid ' + (sel ? (c.ok ? BLUE : RED) : RULE), background: sel ? (c.ok ? BLUET : REDT) : CARD },
+        fbStyle: { fontSize: '14px', lineHeight: '1.45', fontWeight: 600, color: c.ok ? BLUE : RED } }; }),
+      lessonBtnLabel: ['Начать', 'Покажите', s.lessonMarked ? 'Проверить себя' : 'Отметить', s.lessonAns != null && CHECK[s.lessonAns].ok ? 'Завершить' : 'Выберите честный ответ', 'К программе'][s.lessonStep],
+      lessonBtnStyle: { width: '100%', ...pillBtn(!(s.lessonStep === 3 && !(s.lessonAns != null && CHECK[s.lessonAns].ok))), ...(s.lessonStep === 2 && !s.lessonMarked ? { background: RED, color: '#fff' } : {}) },
+      lessonNext: () => this.lessonNext(),
+      lessonToDrill: () => { this.setState({ lessonOpen: false, strawDone: true, lessonStep: 0 }); this.setState(this.resetDrill(DRILLS[0], 0)); this.go('drill'); },
+      hasToast: !!s.toast, toast: s.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>
