@@ -1,3 +1,6 @@
+// Android marks Font(resId, …, variationSettings) as experimental.
+@file:OptIn(ExperimentalTextApi::class)
+
 package app.ergo.ui
 
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -7,6 +10,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
