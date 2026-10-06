@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.ergo.ErgoViewModel
 import app.ergo.data.MarkStyle
+import app.ergo.data.ThemeMode
 import app.ergo.data.fmtCost
 import app.ergo.data.money
 import app.ergo.data.plural
@@ -46,10 +47,18 @@ fun ProfileScreen(vm: ErgoViewModel) {
     ) {
         Text("Профиль", style = serif(32f, 500, lh = 1.05f, ls = -0.02f), modifier = Modifier.padding(top = 6.dp))
 
-        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).rules(C.Rule, top = true, bottom = true)) {
-            Stat("6", "дней подряд", Modifier.weight(1f), first = true)
-            Stat("${vm.doneCount}", "уроков пройдено", Modifier.weight(1f))
-            Stat("9", "к повторению", Modifier.weight(1f))
+        val prog = vm.progress
+        Column {
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).rules(C.Rule, top = true, bottom = true)) {
+                Stat("${vm.streak}", plural(vm.streak, "день подряд", "дня подряд", "дней подряд"), Modifier.weight(1f), first = true)
+                Stat("${vm.doneCount}", plural(vm.doneCount, "урок пройден", "урока пройдено", "уроков пройдено"), Modifier.weight(1f))
+                Stat("${vm.dueCount}", "к повторению", Modifier.weight(1f))
+            }
+            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min).rules(C.Rule, bottom = true)) {
+                Stat("${prog.solved}", plural(prog.solved, "задание решено", "задания решено", "заданий решено"), Modifier.weight(1f), first = true)
+                Stat(prog.accuracy?.let { "$it%" } ?: "—", "точность", Modifier.weight(1f))
+                Stat("${prog.blitzBest}", "рекорд блица", Modifier.weight(1f))
+            }
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -78,7 +87,7 @@ fun ProfileScreen(vm: ErgoViewModel) {
                     }
                 }
                 Row(
-                    Modifier.fillMaxWidth().rules(C.RuleLight, top = true).clickable(onClick = vm::openSheet).padding(horizontal = 18.dp, vertical = 14.dp),
+                    Modifier.fillMaxWidth().rules(C.RuleLight, top = true).clickable(onClick = vm::openModels).padding(horizontal = 18.dp, vertical = 14.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
@@ -106,6 +115,18 @@ fun ProfileScreen(vm: ErgoViewModel) {
             Panel {
                 Row(
                     Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Text("Тема", style = sans(14f, color = C.Mute), modifier = Modifier.weight(1f))
+                    Segmented(
+                        options = listOf(ThemeMode.System to "Авто", ThemeMode.Light to "Светлая", ThemeMode.Dark to "Тёмная"),
+                        selected = vm.themeMode,
+                        onSelect = vm::updateTheme,
+                    )
+                }
+                Row(
+                    Modifier.fillMaxWidth().rules(C.RuleLight, top = true).padding(horizontal = 18.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
@@ -138,8 +159,13 @@ fun ProfileScreen(vm: ErgoViewModel) {
             }
         }
 
-        Box(Modifier.height(40.dp).clickable(onClick = vm::replayOnboarding), contentAlignment = Alignment.CenterStart) {
-            Text("Пройти знакомство заново", style = sans(14f).copy(textDecoration = TextDecoration.Underline))
+        Column {
+            Box(Modifier.height(40.dp).clickable(onClick = vm::replayOnboarding), contentAlignment = Alignment.CenterStart) {
+                Text("Пройти знакомство заново", style = sans(14f).copy(textDecoration = TextDecoration.Underline))
+            }
+            Box(Modifier.height(40.dp).clickable(onClick = vm::askResetProgress), contentAlignment = Alignment.CenterStart) {
+                Text("Сбросить прогресс", style = sans(14f, 600, color = C.Red))
+            }
         }
     }
 }
@@ -164,7 +190,7 @@ private fun Stat(value: String, label: String, modifier: Modifier, first: Boolea
             .padding(start = if (first) 0.dp else 14.dp, top = 14.dp, bottom = 14.dp),
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
-        Text(value, style = serif(30f, 500))
+        Text(value, style = serif(28f, 500))
         Text(label, style = sans(13f, color = C.Mute))
     }
 }

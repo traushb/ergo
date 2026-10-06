@@ -245,7 +245,7 @@ private fun ConnectKey(vm: ErgoViewModel, modifier: Modifier) {
                 Text(link, style = sans(14f, color = C.Mute))
             }
             Tappable(
-                onClick = vm::openSheet,
+                onClick = vm::openModels,
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.fillMaxWidth(),
                 bg = C.Card,

@@ -4,39 +4,50 @@ A native Android app (Kotlin + Jetpack Compose) for learning informal logic, in 
 
 ## What's in it
 
+Everything works offline on a built-in Russian content bank (`app/src/main/assets/content/`). An OpenRouter key adds model-written exercises, explanations, full argument analysis and a live debate opponent.
+
 | Tab | What it does |
 | --- | --- |
-| **Учёба** (Learn) | The six-unit syllabus, a "continue" card and the review entry. The Straw Man lesson is fully built: definition, pattern, an example you mark yourself, a check question and a finish screen. |
-| **Практика** (Drill) | Tap the sentence where the reasoning breaks, then name the fallacy. **Сгенерировать** has the model write a fresh exercise, and **Почему не «…»?** asks it why your answer was wrong. |
-| **Анализ** (Analyze) | Paste any argument. You get flaws marked in the text, a skeleton (conclusion, premises, unstated assumptions), numbered notes and a verdict. |
-| **Спор** (Spar) | You defend a motion and the model argues against it. Any fallacy you commit is flagged under your message. |
-| **Профиль** (You) | Key status, spend and remaining limit (from `GET /key`), session cost, model picker, settings, and disconnect. |
+| **Учёба** (Learn) | 26 lessons in six units, from argument anatomy to rhetoric. Each lesson has five steps: definition, how it works (with the telltale phrase and how to answer), an example to mark up, a check question, and done. Finished lessons enter spaced repetition. |
+| **Практика** (Practice) | Pick a topic: everything, a unit, or one fallacy. **Тренировка** is 6–8 exercises with scoring and a summary. Exercise types: find and name the fallacy (with "clean" snippets where the right answer is "there's no error"), find the conclusion, a premise and the hidden assumption, and logic puzzles. **Блиц** is 60 seconds, with combos and a 3-second penalty. **Повторение** brings topics back after 1, 3, 7 and 21 days. **Свежие задания** has the model write exercises for the chosen topic. Weak spots and per-topic progress are listed, and every topic has a reference card. |
+| **Анализ** (Analyze) | Paste an argument and get flaws marked in the text, its skeleton (conclusion, premises, assumptions), notes and a verdict. Five worked samples are included. Offline, a keyword pass marks possible problems. |
+| **Спор** (Spar) | Defend one of eight motions. Ergo argues against you and flags fallacies, and you get a round-up at the end. Offline, it replies with prepared counter-arguments and calls out fallacies it spots by key phrases. |
+| **Профиль** (You) | Streak, lessons, review queue, solved count, accuracy and blitz record. Key status and model. Settings: theme (auto, light, dark), mark style, cost display. Progress reset. |
 
-Without a key, the app runs in **demo mode** on built-in content, as in the prototype. Analyze only works on the two sample texts, and Spar flags fallacies with simple phrase matching.
+### Content bank
 
-### Differences from the prototype
+| File | Contents |
+| --- | --- |
+| `topics.json` | Units and 26 topics: definition, steps, tell, counter, formula; hand-written lesson examples and checks where needed |
+| `drills.json` | 72 find-and-name snippets (65 flawed, 7 clean lookalikes) with explanations and "why not X" notes |
+| `structure.json` | Conclusion / premise / hidden-assumption exercises |
+| `quizzes.json` | Validity puzzles and base-rate, anchoring, framing and availability questions |
+| `motions.json` | Debate motions with offline replies, plus call-outs per fallacy |
+| `samples.json` | Worked analyses for the Analyze tab |
 
-- The Android device frame is gone; the app runs edge to edge.
-- Two of the prototype's Tweaks are now user settings in **Профиль → Настройки**: mark style (*Карандаш*, a red wavy underline, or *Маркер*, a highlighter) and whether to show request costs. The "start screen" tweak is dropped. The app opens on onboarding the first time and on Learn after that.
-- State that the prototype kept in memory now persists: onboarding done, goal, Straw Man progress, model, and settings.
-- The system back button closes the sheet or lesson, steps back through onboarding, leaves a debate, or returns to Learn.
-- The tab bar hides while the keyboard is open.
+`BankTest` checks that every reference in the bank resolves, so new content can be added by editing JSON.
 
 ## Layout
 
 ```
 app/src/main/java/app/ergo/
-  MainActivity.kt        edge-to-edge host
-  ErgoViewModel.kt       all screen state + actions (port of the prototype's Component class)
-  data/Content.kt        syllabus, drills, samples, topics, prompts, formatting helpers
-  data/OpenRouter.kt     HTTP client: /key, /models, /chat/completions (usage.include for cost)
+  MainActivity.kt        edge-to-edge host; applies the light or dark theme
+  ErgoViewModel.kt       navigation, onboarding, key/model, settings, lessons; wires the controllers
+  Practice.kt            exercise runs, sessions, scoring, blitz, review (PracticeController)
+  Lesson.kt              five-step lessons, built from the bank
+  Debate.kt              Spar and Analyze controllers
+  Ai.kt                  OpenRouter calls and topic-targeted exercise generators
+  data/Bank.kt           content bank model and JSON parser
+  data/Progress.kt       spaced repetition (1/3/7/21 days), streak, stats
+  data/Offline.kt        offline cue detection, keyword analysis, debate replies
+  data/OpenRouter.kt     HTTP client: /key, /models, /chat/completions
   data/Store.kt          SharedPreferences; the API key is AES-GCM encrypted with an Android Keystore key
-  ui/Theme.kt            colour tokens, Literata / Onest / JetBrains Mono, text-style helpers
-  ui/Components.kt       MarkedText (wavy underline / highlighter), Dots, ErgoMark, buttons
-  ui/*.kt                one file per screen, plus the model sheet and the app shell
+  ui/Theme.kt            light and dark palettes, Literata / Onest / JetBrains Mono, text-style helpers
+  ui/Components.kt       marked text (red pencil / blue structure), options, sheets, dialogs
+  ui/*.kt                one file per screen, plus exercises and sheets
 ```
 
-Fonts are bundled from Google Fonts under the SIL OFL, with licenses in `licenses/`. Literata is a variable font. It comes in two optical-size cuts, because Android doesn't choose `opsz` automatically the way browsers do.
+Fonts are bundled from Google Fonts under the SIL OFL, with licenses in `licenses/`.
 
 ## Build
 

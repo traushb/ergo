@@ -29,6 +29,8 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Flag
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,14 +44,14 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import app.ergo.ErgoViewModel
-import app.ergo.data.TOPICS
-import app.ergo.data.plural
+import app.ergo.data.count
 
 @Composable
 fun SparScreen(vm: ErgoViewModel) {
+    val sp = vm.spar
     val scroll = rememberScrollState()
     // Keep the newest message in view.
-    LaunchedEffect(vm.sparMsgs.size, vm.sparLoading) {
+    LaunchedEffect(sp.msgs.size, sp.loading, sp.ended) {
         withFrameNanos {}
         scroll.animateScrollTo(scroll.maxValue)
     }
@@ -57,26 +59,32 @@ fun SparScreen(vm: ErgoViewModel) {
         Modifier.fillMaxSize().verticalScroll(scroll).padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
-        val topic = vm.sparTopic
-        if (topic == null) {
+        val motion = sp.motion
+        if (motion == null) {
             Column(Modifier.padding(top = 6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text("Спор", style = serif(32f, 500, lh = 1.05f, ls = -0.02f))
                 Text(
                     "Вы защищаете тезис. Ergo спорит с вами и обводит каждую логическую ошибку, которую вы допустите.",
                     style = sans(15f, lh = 1.45f, color = C.Body),
                 )
+                if (!vm.connected) {
+                    Text(
+                        "Без ключа OpenRouter соперник отвечает заготовками и ловит ошибки по ключевым фразам.",
+                        style = sans(13f, lh = 1.45f, color = C.Mute),
+                    )
+                }
             }
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                TOPICS.forEach { t ->
+                vm.bank.motions.forEach { m ->
                     Column(
                         Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(C.Card)
                             .border(1.dp, C.Rule, RoundedCornerShape(20.dp))
-                            .clickable { vm.startSpar(t) }
+                            .clickable { sp.start(m) }
                             .padding(horizontal = 20.dp, vertical = 18.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         MonoLabel("ТЕЗИС")
-                        Text(t.motion, style = serif(20f, 500, lh = 1.3f))
+                        Text(m.motion, style = serif(20f, 500, lh = 1.3f))
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Text("Защищать", style = sans(14f, 600, color = C.Red))
                             Ico(Icons.AutoMirrored.Outlined.ArrowForward, 18.dp, C.Red)
@@ -84,74 +92,110 @@ fun SparScreen(vm: ErgoViewModel) {
                     }
                 }
             }
-        } else {
-            Row(
-                Modifier.fillMaxWidth().rules(C.Rule, bottom = true).padding(top = 4.dp, bottom = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                RoundIconButton(Icons.AutoMirrored.Outlined.ArrowBack, vm::endSpar, 40.dp, 22.dp, Modifier.offset(x = (-8).dp))
-                Column(Modifier.weight(1f).padding(top = 2.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                    MonoLabel("ВЫ: ЗА · ERGO: ПРОТИВ", ls = 0.1f)
-                    Text(topic.motion, style = serif(16f, 500, lh = 1.35f))
-                }
-                val n = vm.sparMsgs.count { it.flag != null }
-                Row(
-                    Modifier.padding(top = 4.dp).height(28.dp).clip(RoundedCornerShape(14.dp)).background(C.RedTint).padding(horizontal = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    Ico(Icons.Outlined.Edit, 15.dp, C.Red)
-                    Text("$n ${plural(n, "ошибка", "ошибки", "ошибок")}", style = sans(13f, 700, color = C.Red), maxLines = 1)
-                }
+            return@Column
+        }
+
+        Row(
+            Modifier.fillMaxWidth().rules(C.Rule, bottom = true).padding(top = 4.dp, bottom = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            RoundIconButton(Icons.AutoMirrored.Outlined.ArrowBack, sp::end, 40.dp, 22.dp, Modifier.offset(x = (-8).dp))
+            Column(Modifier.weight(1f).padding(top = 2.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                MonoLabel("ВЫ: ЗА · ERGO: ПРОТИВ", ls = 0.1f)
+                Text(motion.motion, style = serif(16f, 500, lh = 1.35f))
             }
-            BoxWithConstraints(Modifier.fillMaxWidth()) {
-                val w = maxWidth
-                Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    vm.sparMsgs.forEach { m ->
-                        if (!m.fromMe) {
-                            Column(Modifier.widthIn(max = w * 0.88f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                MonoLabel("ERGO", ls = 0.1f)
-                                val shape = RoundedCornerShape(topStart = 4.dp, topEnd = 18.dp, bottomEnd = 18.dp, bottomStart = 18.dp)
-                                Text(
-                                    m.text,
-                                    style = serif(16f, lh = 1.55f),
-                                    modifier = Modifier.clip(shape).background(C.Card).border(1.dp, C.Rule, shape).padding(horizontal = 16.dp, vertical = 14.dp),
-                                )
-                            }
-                        } else {
-                            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Text(
-                                    m.text,
-                                    style = sans(15f, lh = 1.5f, color = C.Paper),
-                                    modifier = Modifier.widthIn(max = w * 0.84f)
-                                        .clip(RoundedCornerShape(topStart = 18.dp, topEnd = 4.dp, bottomEnd = 18.dp, bottomStart = 18.dp))
-                                        .background(C.Ink).padding(horizontal = 16.dp, vertical = 12.dp),
-                                )
-                                m.flag?.let { f ->
-                                    Column(
-                                        Modifier.widthIn(max = w * 0.84f).clip(RoundedCornerShape(14.dp)).background(C.Card)
-                                            .border(1.5.dp, C.Red, RoundedCornerShape(14.dp)).padding(horizontal = 14.dp, vertical = 10.dp),
-                                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                                    ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                            Ico(Icons.Outlined.Edit, 16.dp, C.Red)
-                                            Text(f.name, style = sans(14f, 700, color = C.Red))
-                                        }
-                                        Text("«${f.quote}»", style = serif(15f, italic = true, color = C.Soft))
-                                        Text(f.note, style = sans(14f, lh = 1.45f, color = C.Soft))
+            val n = sp.flags.size
+            Chip(count(n, "ошибка", "ошибки", "ошибок"), C.Red, C.RedTint, Modifier.padding(top = 4.dp), icon = Icons.Outlined.Edit, height = 28.dp, fontSize = 13f)
+        }
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+            val w = maxWidth
+            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                sp.msgs.forEach { m ->
+                    if (!m.fromMe) {
+                        Column(Modifier.widthIn(max = w * 0.88f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            MonoLabel("ERGO", ls = 0.1f)
+                            val shape = RoundedCornerShape(topStart = 4.dp, topEnd = 18.dp, bottomEnd = 18.dp, bottomStart = 18.dp)
+                            Text(
+                                m.text,
+                                style = serif(16f, lh = 1.55f),
+                                modifier = Modifier.clip(shape).background(C.Card).border(1.dp, C.Rule, shape).padding(horizontal = 16.dp, vertical = 14.dp),
+                            )
+                        }
+                    } else {
+                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text(
+                                m.text,
+                                style = sans(15f, lh = 1.5f, color = C.Paper),
+                                modifier = Modifier.widthIn(max = w * 0.84f)
+                                    .clip(RoundedCornerShape(topStart = 18.dp, topEnd = 4.dp, bottomEnd = 18.dp, bottomStart = 18.dp))
+                                    .background(C.Ink).padding(horizontal = 16.dp, vertical = 12.dp),
+                            )
+                            m.flag?.let { f ->
+                                val topic = f.topic
+                                Column(
+                                    Modifier.widthIn(max = w * 0.84f).clip(RoundedCornerShape(14.dp)).background(C.Card)
+                                        .border(1.5.dp, C.Red, RoundedCornerShape(14.dp))
+                                        .then(if (topic != null) Modifier.clickable { vm.openReference(topic) } else Modifier)
+                                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                        Ico(Icons.Outlined.Edit, 16.dp, C.Red)
+                                        Text(f.name, style = sans(14f, 700, color = C.Red), modifier = Modifier.weight(1f, fill = false))
+                                        if (topic != null) Ico(Icons.Outlined.Info, 16.dp, C.Mute)
                                     }
+                                    Text("«${f.quote}»", style = serif(15f, italic = true, color = C.Soft))
+                                    Text(f.note, style = sans(14f, lh = 1.45f, color = C.Soft))
                                 }
                             }
                         }
                     }
-                    if (vm.sparLoading) {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                            Dots(C.Mute)
-                            Text("Ergo готовит возражение…", style = sans(14f, color = C.Mute))
-                        }
+                }
+                if (sp.loading) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Dots(C.Mute)
+                        Text("Ergo готовит возражение…", style = sans(14f, color = C.Mute))
                     }
                 }
+                if (sp.ended) SparRoundUp(vm)
             }
+        }
+    }
+}
+
+/** The end-of-debate card: how many turns, which fallacies. */
+@Composable
+private fun SparRoundUp(vm: ErgoViewModel) {
+    val sp = vm.spar
+    val turns = sp.myTurns
+    val flags = sp.flags
+    val clean = turns - flags.size
+    Column(
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(C.Hero).padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Ico(Icons.Outlined.Flag, 18.dp, C.HeroMute)
+            MonoLabel("ИТОГ СПОРА", color = C.HeroMute)
+        }
+        Text(
+            if (flags.isEmpty()) "Ни одной ошибки за ${count(turns, "реплику", "реплики", "реплик")}."
+            else "Чистых реплик: $clean из $turns.",
+            style = serif(24f, 500, lh = 1.2f, color = C.OnHero),
+        )
+        if (flags.isNotEmpty()) {
+            Text(
+                "Замечено: " + flags.map { it.name }.distinct().joinToString(", ") + ".",
+                style = sans(15f, lh = 1.5f, color = C.HeroBody),
+            )
+        }
+        Text(
+            if (flags.isEmpty()) "Хорошая работа. Попробуйте тезис посложнее." else "Нажмите на пометку под репликой, чтобы открыть справку.",
+            style = sans(14f, lh = 1.45f, color = C.HeroMute),
+        )
+        Row(Modifier.padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            OutlineButton("Продолжить", sp::resume, Modifier.weight(1f), height = 46.dp, color = C.OnHero)
+            PillButton("Новый тезис", sp::leave, Modifier.weight(1f), height = 46.dp, fontSize = 15f, bg = C.OnHero, fg = C.Hero)
         }
     }
 }
@@ -159,6 +203,7 @@ fun SparScreen(vm: ErgoViewModel) {
 /** Composer bar shown above the tab bar while a debate is running. */
 @Composable
 fun SparInputBar(vm: ErgoViewModel) {
+    val sp = vm.spar
     val interaction = remember { MutableInteractionSource() }
     val focused by interaction.collectIsFocusedAsState()
     Row(
@@ -168,14 +213,14 @@ fun SparInputBar(vm: ErgoViewModel) {
     ) {
         val style = sans(15f)
         BasicTextField(
-            value = vm.sparInput,
-            onValueChange = vm::onSparInput,
+            value = sp.input,
+            onValueChange = sp::onInput,
             singleLine = true,
             textStyle = style,
             cursorBrush = SolidColor(C.Ink),
             interactionSource = interaction,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-            keyboardActions = KeyboardActions(onSend = { vm.sendSpar() }),
+            keyboardActions = KeyboardActions(onSend = { sp.send() }),
             modifier = Modifier.weight(1f),
             decorationBox = { inner ->
                 Box(
@@ -184,15 +229,14 @@ fun SparInputBar(vm: ErgoViewModel) {
                         .padding(horizontal = 18.dp),
                     contentAlignment = Alignment.CenterStart,
                 ) {
-                    if (vm.sparInput.isEmpty()) Text("Ваш аргумент…", style = style.copy(color = C.Placeholder))
+                    if (sp.input.isEmpty()) Text("Ваш аргумент…", style = style.copy(color = C.Placeholder))
                     inner()
                 }
             },
         )
         Box(
-            Modifier.size(46.dp).clip(CircleShape).background(C.Ink).clickable(onClick = vm::sendSpar),
+            Modifier.size(46.dp).clip(CircleShape).background(C.Ink).clickable(onClick = sp::send),
             contentAlignment = Alignment.Center,
         ) { Ico(Icons.Outlined.ArrowUpward, 20.dp, C.Paper) }
     }
 }
-

@@ -29,6 +29,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountTree
 import androidx.compose.material.icons.outlined.ContentPaste
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -47,7 +49,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.ergo.ErgoViewModel
 import app.ergo.data.Analysis
-import app.ergo.data.SAMPLES
 import app.ergo.data.VERDICT_RU
 
 private data class MarkSpan(val s: Int, val e: Int, val n: Int)
@@ -71,8 +72,8 @@ fun AnalyzeScreen(vm: ErgoViewModel) {
         val focused by interaction.collectIsFocusedAsState()
         val style = serif(17f, lh = 1.5f)
         BasicTextField(
-            value = vm.anText,
-            onValueChange = vm::onAnText,
+            value = vm.analyze.text,
+            onValueChange = vm.analyze::onText,
             textStyle = style,
             cursorBrush = SolidColor(C.Ink),
             interactionSource = interaction,
@@ -83,16 +84,16 @@ fun AnalyzeScreen(vm: ErgoViewModel) {
                         .border(1.dp, if (focused) C.Ink else C.Rule, RoundedCornerShape(18.dp))
                         .padding(horizontal = 18.dp, vertical = 16.dp)
                 ) {
-                    if (vm.anText.isEmpty()) Text("Вставьте или напишите аргумент…", style = style.copy(color = C.Placeholder))
+                    if (vm.analyze.text.isEmpty()) Text("Вставьте или напишите аргумент…", style = style.copy(color = C.Placeholder))
                     inner()
                 }
             },
         )
 
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            SAMPLES.forEachIndexed { i, sm ->
+            vm.bank.samples.forEachIndexed { i, sm ->
                 Tappable(
-                    onClick = { vm.useSample(i) },
+                    onClick = { vm.analyze.useSample(i) },
                     shape = RoundedCornerShape(17.dp),
                     modifier = Modifier.height(34.dp),
                     border = BorderStroke(1.dp, C.Rule),
@@ -106,18 +107,18 @@ fun AnalyzeScreen(vm: ErgoViewModel) {
         }
 
         Tappable(
-            onClick = vm::analyze,
+            onClick = vm.analyze::analyze,
             shape = RoundedCornerShape(27.dp),
             modifier = Modifier.fillMaxWidth().height(54.dp),
             bg = C.Ink,
             horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
         ) {
-            if (vm.anLoading) Dots(C.Paper)
+            if (vm.analyze.loading) Dots(C.Paper)
             Ico(Icons.Outlined.AccountTree, 20.dp, C.Paper)
-            Text(if (vm.anLoading) "Разбираем…" else "Разобрать аргумент", style = sans(16f, 600, color = C.Paper))
+            Text(if (vm.analyze.loading) "Разбираем…" else "Разобрать аргумент", style = sans(16f, 600, color = C.Paper))
         }
 
-        vm.anResult?.let { AnalysisResult(vm, it) }
+        vm.analyze.result?.let { AnalysisResult(vm, it) }
     }
 }
 
@@ -127,7 +128,7 @@ private fun AnalysisResult(vm: ErgoViewModel, an: Analysis) {
         // Source text with numbered marks
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             MonoLabel("С ПОМЕТКАМИ")
-            val src = vm.anSource
+            val src = vm.analyze.source
             val found = an.issues.mapIndexedNotNull { i, issue ->
                 val q = issue.quote.trim()
                 if (q.isEmpty()) return@mapIndexedNotNull null
@@ -150,7 +151,7 @@ private fun AnalysisResult(vm: ErgoViewModel, an: Analysis) {
                 }
                 if (pos < src.length) append(src.substring(pos))
             }
-            MarkedText(text, serif(17f, lh = 1.7f), marks, vm.markStyle)
+            MarkedText(text, serif(17f, lh = 1.7f), marks.map { TextMark(it) }, vm.markStyle)
         }
 
         // Skeleton: conclusion, premises, hidden assumptions
@@ -179,6 +180,18 @@ private fun AnalysisResult(vm: ErgoViewModel, an: Analysis) {
                             Text(t, style = sans(15f, lh = 1.45f))
                         }
                     }
+                    if (an.heuristic) {
+                        Row(
+                            Modifier.fillMaxWidth().dashedBorder(C.Dashed, 1.5.dp, 14.dp).padding(horizontal = 13.dp, vertical = 11.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            Text("A?", style = mono(12f, 500), modifier = Modifier.padding(top = 2.dp))
+                            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                MonoLabel("ВОПРОС К ВАМ", size = 10f, ls = 0.1f)
+                                Text("Что должно быть правдой, чтобы из посылок следовал вывод? Скрытые допущения офлайн-разбор не ищет.", style = sans(15f, lh = 1.45f, italic = true, color = C.Soft))
+                            }
+                        }
+                    }
                     an.assumptions.forEachIndexed { i, t ->
                         Row(
                             Modifier.fillMaxWidth().dashedBorder(C.Dashed, 1.5.dp, 14.dp).padding(horizontal = 13.dp, vertical = 11.dp),
@@ -199,12 +212,19 @@ private fun AnalysisResult(vm: ErgoViewModel, an: Analysis) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             MonoLabel("КРАСНЫЙ КАРАНДАШ", color = C.Red)
             an.issues.forEachIndexed { i, issue ->
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                val topic = issue.topic
+                Row(
+                    (if (topic != null) Modifier.clickable { vm.openReference(topic) } else Modifier),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
                     Box(Modifier.size(24.dp).border(1.5.dp, C.Red, CircleShape), contentAlignment = Alignment.Center) {
                         Text("${i + 1}", style = mono(12f, 500, color = C.Red))
                     }
                     Column(Modifier.padding(top = 1.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(issue.name, style = sans(16f, 700, color = C.Red))
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text(issue.name, style = sans(16f, 700, color = C.Red), modifier = Modifier.weight(1f, fill = false))
+                            if (topic != null) Ico(Icons.Outlined.Info, 16.dp, C.Mute)
+                        }
                         Text(issue.note, style = sans(15f, lh = 1.5f, color = C.Soft))
                     }
                 }
@@ -214,21 +234,21 @@ private fun AnalysisResult(vm: ErgoViewModel, an: Analysis) {
         // Verdict
         val score = mapOf("Strong" to 3, "Moderate" to 2, "Weak" to 1)[an.verdict] ?: 2
         Column(
-            Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(C.Ink).padding(horizontal = 20.dp, vertical = 18.dp),
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp)).background(C.Hero).padding(horizontal = 20.dp, vertical = 18.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                MonoLabel("ИТОГ", color = C.OnDarkMute, modifier = Modifier.weight(1f))
+                MonoLabel(if (an.heuristic) "ПРЕДВАРИТЕЛЬНО" else "ИТОГ", color = C.HeroMute, modifier = Modifier.weight(1f))
                 Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                     (1..3).forEach { i ->
-                        val on = when (score) { 1 -> C.VerdictWeak; 3 -> C.VerdictStrong; else -> C.Paper }
-                        Box(Modifier.size(10.dp).clip(CircleShape).background(if (i <= score) on else C.Paper.copy(alpha = .2f)))
+                        val on = when (score) { 1 -> C.VerdictWeak; 3 -> C.VerdictStrong; else -> C.OnHero }
+                        Box(Modifier.size(10.dp).clip(CircleShape).background(if (i <= score) on else C.OnHero.copy(alpha = .2f)))
                     }
                 }
             }
-            Text((VERDICT_RU[an.verdict] ?: an.verdict) + " аргумент", style = serif(26f, 500, lh = 1.1f, color = C.Paper))
-            Text(an.summary, style = sans(15f, lh = 1.5f, color = C.OnDarkBody))
+            Text(if (an.heuristic) (if (an.issues.isEmpty()) "Явных ошибок не видно" else "Есть что проверить") else (VERDICT_RU[an.verdict] ?: an.verdict) + " аргумент", style = serif(26f, 500, lh = 1.1f, color = C.OnHero))
+            Text(an.summary, style = sans(15f, lh = 1.5f, color = C.HeroBody))
         }
-        Text(vm.anMeta, style = mono(11f), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        Text(vm.analyze.meta, style = mono(11f), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
     }
 }

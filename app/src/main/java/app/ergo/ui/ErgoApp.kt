@@ -5,14 +5,11 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
@@ -50,6 +47,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import app.ergo.ErgoViewModel
 import app.ergo.Screen
+import app.ergo.Sheet
 import app.ergo.Tab
 
 private data class NavItem(val tab: Tab, val label: String, val outlined: ImageVector, val filled: ImageVector)
@@ -72,23 +70,27 @@ fun ErgoApp(vm: ErgoViewModel, onExit: () -> Unit) {
             Screen.App -> AppShell(vm)
         }
 
-        AnimatedVisibility(vm.lessonOpen, enter = fadeIn(), exit = fadeOut()) {
-            LessonScreen(vm)
+        val lesson = rememberLast(vm.lesson)
+        AnimatedVisibility(vm.lesson != null, enter = fadeIn(), exit = fadeOut()) {
+            lesson?.let { LessonScreen(vm, it) }
         }
 
-        AnimatedVisibility(vm.sheetOpen, enter = fadeIn(), exit = fadeOut()) {
-            SheetScrim(vm::closeSheet)
+        BottomSheet(vm.sheet == Sheet.Model, vm::closeSheet) { ModelSheet(vm) }
+        BottomSheet(vm.sheet == Sheet.Topics, vm::closeSheet, fraction = 0.85f) { TopicSheet(vm) }
+        val ref = rememberLast(vm.sheet as? Sheet.Reference)
+        BottomSheet(vm.sheet is Sheet.Reference, vm::closeSheet, fraction = null) {
+            ref?.let { ReferenceSheet(vm, it.topic) }
         }
-        BoxWithConstraints(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
-            val sheetHeight = maxHeight * 0.8f
-            AnimatedVisibility(
-                vm.sheetOpen,
-                enter = slideInVertically { it },
-                exit = slideOutVertically { it },
-            ) {
-                ModelSheet(vm, Modifier.height(sheetHeight))
-            }
-        }
+
+        val confirm = rememberLast(vm.confirm)
+        ConfirmDialog(
+            visible = vm.confirm != null,
+            title = confirm?.title.orEmpty(),
+            text = confirm?.text.orEmpty(),
+            action = confirm?.action.orEmpty(),
+            onYes = vm::confirmYes,
+            onNo = vm::confirmNo,
+        )
 
         AnimatedVisibility(
             vm.toastVisible,
@@ -108,13 +110,13 @@ private fun AppShell(vm: ErgoViewModel) {
         Box(Modifier.weight(1f).fillMaxWidth()) {
             when (vm.tab) {
                 Tab.Learn -> LearnScreen(vm)
-                Tab.Drill -> DrillScreen(vm)
+                Tab.Drill -> PracticeScreen(vm)
                 Tab.Analyze -> AnalyzeScreen(vm)
                 Tab.Spar -> SparScreen(vm)
                 Tab.You -> ProfileScreen(vm)
             }
         }
-        if (vm.tab == Tab.Spar && vm.sparTopic != null) SparInputBar(vm)
+        if (vm.tab == Tab.Spar && vm.spar.motion != null && !vm.spar.ended) SparInputBar(vm)
         // The tab bar would ride on top of the keyboard; hide it while typing.
         if (!WindowInsets.isImeVisible) BottomNav(vm)
     }

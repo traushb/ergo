@@ -1,0 +1,4 @@
+<resources>
+    <!-- Window background before the first frame, so a dark launch doesn't flash paper-white. -->
+    <color name="window_bg">#171513</color>
+</resources>

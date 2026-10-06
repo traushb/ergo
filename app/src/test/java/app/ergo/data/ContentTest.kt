@@ -5,6 +5,8 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 
 class ContentTest {
+    private val bank = TestBank.bank
+
     @Test fun pluralRussian() {
         assertEquals("урок", plural(1, "урок", "урока", "уроков"))
         assertEquals("урока", plural(3, "урок", "урока", "уроков"))
@@ -13,15 +15,23 @@ class ContentTest {
         assertEquals("уроков", plural(12, "урок", "урока", "уроков"))
         assertEquals("урок", plural(21, "урок", "урока", "уроков"))
         assertEquals("урока", plural(23, "урок", "урока", "уроков"))
+        assertEquals("26 уроков", count(26, "урок", "урока", "уроков"))
     }
 
     @Test fun demoFlagMatchesCyrillicCaseInsensitively() {
-        assertEquals("Соломенное чучело", demoFlag("То есть вы хотите запретить всё?")?.name)
-        assertEquals("Переход на личности", demoFlag("Вы просто не понимаете сути.")?.name)
-        assertEquals("Ложная дилемма", demoFlag("Либо мы запрещаем, либо дети страдают.")?.name)
-        assertEquals("Поспешное обобщение", demoFlag("Все подростки сидят в телефонах.")?.name)
-        assertEquals("Скользкая дорожка", demoFlag("Если мы уступим сейчас, то скоро потеряем всё.")?.name)
+        assertEquals("straw_man", demoFlag("То есть вы хотите запретить всё?")?.topic)
+        assertEquals("ad_hominem", demoFlag("Вы просто не понимаете сути.")?.topic)
+        assertEquals("false_dilemma", demoFlag("Либо мы запрещаем, либо дети страдают.")?.topic)
+        assertEquals("hasty", demoFlag("Все подростки сидят в телефонах.")?.topic)
+        assertEquals("slippery", demoFlag("Если мы уступим сейчас, то скоро потеряем всё.")?.topic)
+        assertEquals("bandwagon", demoFlag("Все так делают, и ничего.")?.topic)
+        assertEquals("tu_quoque", demoFlag("А сами-то вы не опаздываете?")?.topic)
+        assertEquals("authority", demoFlag("Учёные доказали, что это работает.")?.topic)
         assertNull(demoFlag("Исследования показывают умеренный эффект."))
+    }
+
+    @Test fun demoFlagUsesBankNames() {
+        assertEquals("Соломенное чучело", demoFlag("То есть вы хотите запретить всё?", bank)?.name)
     }
 
     @Test fun demoFlagQuoteIsTrimmedAndCapped() {

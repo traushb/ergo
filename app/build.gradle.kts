@@ -32,6 +32,10 @@ android {
     buildFeatures {
         compose = true
     }
+    testOptions {
+        // Local unit tests run against android.jar stubs; return defaults instead of throwing.
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -48,4 +52,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     debugImplementation(libs.androidx.compose.ui.tooling)
     testImplementation(libs.junit)
+    // The real org.json, which android.jar only stubs out for local unit tests.
+    testImplementation(libs.json)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

@@ -1,140 +1,11 @@
 package app.ergo.data
 
-// Built-in content. Copy is taken verbatim from the design prototype (design/project/Ergo.dc.html).
+// Shared models, model prompts and formatting. The learning content itself lives in
+// assets/content/*.json (see Bank.kt).
 
-data class SyllabusUnit(val n: String, val title: String, val lessons: List<String>)
+enum class MarkStyle { Pencil, Highlighter }
 
-val UNITS = listOf(
-    SyllabusUnit("I", "Анатомия аргумента", listOf("Тезисы и выводы", "Посылки", "Скрытые допущения", "Правильность и обоснованность")),
-    SyllabusUnit("II", "Ошибки релевантности", listOf("Переход на личности", "Соломенное чучело", "Ложный след", "Апелляция к авторитету", "Tu quoque («сам такой»)")),
-    SyllabusUnit("III", "Допущения и двусмысленность", listOf("Ложная дилемма", "Предвосхищение основания", "Скользкая дорожка", "Эквивокация")),
-    SyllabusUnit("IV", "Индукция и доказательства", listOf("Поспешное обобщение", "Корреляция и причинность", "Выборочные данные", "Игнорирование базовой частоты")),
-    SyllabusUnit("V", "Когнитивные искажения", listOf("Предвзятость подтверждения", "Эффект якоря", "Эвристика доступности")),
-    SyllabusUnit("VI", "Риторика и убеждение", listOf("Нагруженная лексика", "Уклончивые формулировки", "Фрейминг")),
-)
-const val CUR_LESSON = "Соломенное чучело"
-
-data class Drill(
-    val source: String,
-    val sentences: List<String>,
-    val flawed: List<Int>,
-    val answer: String,
-    val options: List<String>,
-    val explanation: String,
-    val whyNot: Map<String, String>,
-    val ai: Boolean = false,
-    val meta: String? = null,
-)
-
-val DRILLS = listOf(
-    Drill(
-        "Комментарий · форум района Заречье",
-        listOf("Новое исследование мэрии говорит, что велодорожки в центре снизили число травм на дорогах на 30%.", "Но ведущий автор сам каждый день ездит на работу на велосипеде, так что, конечно, он нашёл то, что хотел.", "Я уж лучше поверю своим глазам."),
-        listOf(1), "Переход на личности", listOf("Соломенное чучело", "Переход на личности", "Ложный след", "Апелляция к авторитету"),
-        "Комментатор даже не касается данных. Он бьёт по привычкам исследователя и считает, что из них следует предвзятость. Ездит ли автор на велосипеде, никак не влияет на то, снизились ли травмы на 30%.",
-        mapOf(
-            "Соломенное чучело" to "Чучело искажает позицию оппонента. Здесь тезис (минус 30% травм) передан точно. Удар приходится по человеку, а не по позиции.",
-            "Ложный след" to "Близко: велосипед действительно отвлекает внимание. Но он нацелен именно на то, чтобы дискредитировать источник, поэтому это переход на личности, а не просто смена темы.",
-            "Апелляция к авторитету" to "Это было бы принятие тезиса потому, что его высказал авторитет. Комментатор делает обратное и отвергает тезис из-за того, кто его высказал.",
-        ),
-    ),
-    Drill(
-        "Реклама · БАД «ВитаКор»",
-        listOf("Устаёте к трём часам дня?", "В нашем опросе подписчиков «ВитаКор» 9 из 10 сказали, что чувствуют прилив сил.", "Продаётся во всех аптеках страны."),
-        listOf(1), "Нерепрезентативная выборка", listOf("Апелляция к большинству", "Апелляция к эмоциям", "Нерепрезентативная выборка", "Предвосхищение основания"),
-        "Подписку продлевают те, кому продукт уже нравится. Опрос среди них говорит о поклонниках, а не о том, работает ли добавка.",
-        mapOf(
-            "Апелляция к большинству" to "Эта ошибка звучит как «все так делают, делай и ты». Реклама же приводит статистику как доказательство. Проблема в том, откуда эта статистика.",
-            "Апелляция к эмоциям" to "«Устаёте к трём часам?» давит на чувства, но вся доказательная нагрузка лежит на опросе. Ошибка именно там.",
-            "Предвосхищение основания" to "Здесь вывод прячется в посылке. А у нас посылка — правдоподобный опрос, просто по перекошенной группе.",
-        ),
-    ),
-    Drill(
-        "Колонка · «Вечерний вестник»",
-        listOf("Школьный совет хочет разрешить одну пересдачу экзамена в четверть.", "Разрешите это, и скоро ученики будут требовать переделывать каждое задание.", "А там и сроки вовсе перестанут что-либо значить.", "Голосуйте против поправки № 4."),
-        listOf(1, 2), "Скользкая дорожка", listOf("Ложная дилемма", "Скользкая дорожка", "Соломенное чучело", "Поспешное обобщение"),
-        "Одну пересдачу в четверть связывают цепочкой с тем, что «сроки ничего не значат», и никак не доказывают, что каждое звено выдерживает. Спуск по склону автор утверждает, но не показывает.",
-        mapOf(
-            "Ложная дилемма" to "Ложная дилемма сужает выбор до двух вариантов. Здесь варианты не сужают, а предсказывают ничем не подкреплённую цепочку последствий.",
-            "Соломенное чучело" to "Соблазнительно: предложение действительно выглядит радикальнее. Но саму политику описали точно, а затем придумали, куда она приведёт. Это и есть дорожка.",
-            "Поспешное обобщение" to "Это вывод общего правила из слишком малого числа случаев. Здесь случаев нет вообще, только предсказанная цепочка.",
-        ),
-    ),
-    Drill(
-        "Семейный чат",
-        listOf("Либо ты в этом году делаешь прививку от гриппа, либо тебе просто плевать на бабушку.", "Всё просто.", "Кстати, ужин в семь!"),
-        listOf(0, 1), "Ложная дилемма", listOf("Переход на личности", "Апелляция к эмоциям", "Эквивокация", "Ложная дилемма"),
-        "Два варианта подаются как единственные. Можно очень любить бабушку и всё равно иметь причины отложить прививку, в том числе медицинские.",
-        mapOf(
-            "Переход на личности" to "Укол в адрес характера есть, но структура другая: «А или Б; не А, значит Б», а все остальные варианты молча вычеркнуты.",
-            "Апелляция к эмоциям" to "Бабушка, конечно, работает на эмоции. Но логический дефект — навязанное «или-или». Эмоция лишь помогает ему сработать.",
-            "Эквивокация" to "Эквивокация меняет значение слова по ходу рассуждения. Здесь ни одно слово значения не меняет.",
-        ),
-    ),
-)
-
-data class Issue(val name: String, val quote: String, val note: String)
-
-data class Analysis(
-    val conclusion: String,
-    val premises: List<String>,
-    val assumptions: List<String>,
-    val issues: List<Issue>,
-    val verdict: String,
-    val summary: String,
-)
-
-data class Sample(val label: String, val text: String, val result: Analysis)
-
-val SAMPLES = listOf(
-    Sample(
-        "Служебная записка",
-        "Удалёнка убивает нашу продуктивность. С тех пор как компания перешла на удалённую работу, квартальная выработка упала на 8%. Все руководители, с которыми я говорил, согласны. Если мы не вернёмся в офис прямо сейчас, то полностью потеряем конкурентное преимущество.",
-        Analysis(
-            "Компании нужно немедленно вернуться в офис.",
-            listOf("После перехода на удалёнку квартальная выработка снизилась на 8%.", "Руководители, с которыми говорил автор, считают, что удалёнка вредит продуктивности."),
-            listOf("Спад вызван именно удалёнкой, а не рынком, кадрами или сезонностью.", "Опрошенные руководители — репрезентативная и непредвзятая выборка."),
-            listOf(
-                Issue("Post hoc (корреляция ≠ причина)", "С тех пор как компания перешла на удалённую работу, квартальная выработка упала на 8%", "Совпадение по времени — не причинность. Всё, что ещё изменилось в том квартале, — альтернативное объяснение."),
-                Issue("Нерепрезентативная выборка", "Все руководители, с которыми я говорил, согласны", "Выборочный круг руководителей, которым может быть удобнее контролировать людей в офисе, не заменяет данных о выработке."),
-                Issue("Ложная дилемма", "Если мы не вернёмся в офис прямо сейчас, то полностью потеряем конкурентное преимущество", "Пропущены промежуточные варианты: гибридный график, инструменты, устранение реальной причины спада."),
-            ),
-            "Weak",
-            "Один реальный факт несёт причинный вывод, который не выдерживает, а затем раздувается до ультиматума.",
-        ),
-    ),
-    Sample(
-        "Пост в районном чате",
-        "Преступность в городе вышла из-под контроля. Только в этом месяце на моей улице было три кражи со взломом. Мэр предпочитает тратить деньги на парки, а не на полицию. Любой, кто за неё голосует, очевидно хочет, чтобы на наших улицах было опасно.",
-        Analysis(
-            "Не голосуйте за мэра: она проваливает борьбу с преступностью.",
-            listOf("В этом месяце на улице автора было три кражи со взломом.", "Мэр финансирует парки, а не полицию."),
-            listOf("Одна улица за один месяц отражает преступность по всему городу.", "Главный рычаг против преступности — бюджет полиции, поэтому парки идут в ущерб безопасности."),
-            listOf(
-                Issue("Поспешное обобщение", "на моей улице было три кражи со взломом", "Одна улица за месяц мало говорит о городе. Значима динамика по всему городу."),
-                Issue("Ложная дилемма", "предпочитает тратить деньги на парки, а не на полицию", "Бюджет — не меню из двух пунктов, и «парки или полиция» — не реальный выбор, который стоит на повестке."),
-                Issue("Соломенное чучело", "Любой, кто за неё голосует, очевидно хочет, чтобы на наших улицах было опасно", "Ни один избиратель так не считает. Их настоящие мотивы подменены абсурдным."),
-            ),
-            "Weak",
-            "Яркий случай, навязанный выбор и карикатура на оппонентов подменяют доказательства.",
-        ),
-    ),
-)
-val VERDICT_RU = mapOf("Strong" to "Сильный", "Moderate" to "Средний", "Weak" to "Слабый")
-
-data class Topic(val motion: String, val opener: String)
-
-val TOPICS = listOf(
-    Topic("Соцсети приносят подросткам больше вреда, чем пользы.", "Я займу противоположную сторону. Большинство подростков говорят, что соцсети помогают им чувствовать связь с другими, а исследования о вреде в основном корреляционные. Какое у вас самое сильное доказательство, что именно соцсети причиняют вред?"),
-    Topic("Домашние задания в начальной школе нужно отменить.", "Я против. Домашка учит детей заниматься без учителя над душой, а родители видят, что проходят в школе. Что заменит эти две вещи?"),
-    Topic("Центр города нужно закрыть для машин.", "Я возражу. Доставка, доступ для людей с инвалидностью и работа мастеров никуда не денутся, если запретить машины. Кто заплатит за ваш план, и вы спросили их мнение?"),
-)
-val SPAR_DEMO = listOf(
-    "Справедливо, но вы слишком многое строите на одном примере. Что бы вы увидели, если бы ошибались?",
-    "Это предполагает, что ту же пользу нельзя получить иначе. А можно?",
-    "Допустим, я соглашусь. Это всё равно не показывает, что вред перевешивает пользу, а тезис именно об этом.",
-    "Вы описали проблему. Я всё ещё жду аргумента, что ваше решение её устраняет.",
-)
+enum class ThemeMode { System, Light, Dark }
 
 data class Goal(val id: String, val title: String, val sub: String)
 
@@ -145,46 +16,53 @@ val GOALS = listOf(
     Goal("curious", "Просто интересно", "В своём темпе, без спешки"),
 )
 
-data class CheckOption(val text: String, val ok: Boolean, val fb: String)
+/** [topic] links an issue to the reference card, when it matches a known topic. */
+data class Issue(val name: String, val quote: String, val note: String, val topic: String? = null)
 
-val CHECK = listOf(
-    CheckOption("«То есть вы хотите запретить машины? Удачи довезти продукты на велосипеде».", false, "Снова ход Лёши: тезис сильнее того, что сказала Маша."),
-    CheckOption("«Перенос бюджета с дорог может замедлить доставку. Кто-нибудь это посчитал?»", true, "Да. Ничего не придумано, и ответ давит на реальную цену её предложения."),
-    CheckOption("«Типичная велосипедистка. Вы просто ненавидите водителей».", false, "Не чучело, но и не спор по существу. Это переход на личности из прошлого урока."),
+data class Analysis(
+    val conclusion: String,
+    val premises: List<String>,
+    val assumptions: List<String>,
+    val issues: List<Issue>,
+    val verdict: String,
+    val summary: String,
+    /** True for the offline keyword-based pass, which only points at possible problems. */
+    val heuristic: Boolean = false,
 )
 
-data class Flag(val name: String, val quote: String, val note: String)
+val VERDICT_RU = mapOf("Strong" to "Сильный", "Moderate" to "Средний", "Weak" to "Слабый")
 
-/** Offline stand-in for the model's fallacy check in Spar: simple phrase matching. */
-fun demoFlag(t: String): Flag? {
-    val tests = listOf(
-        Triple("то есть (?:вы|ты) (?:хоти|счита|говори)[^.?!]*", "Соломенное чучело", "Это пересказ моей позиции в более сильной форме, чем я её высказал."),
-        Triple("(?:^|\\s)(?:типичн\\S*|(?:вы|ты) просто)[^.?!]*", "Переход на личности", "Удар по человеку, а не по аргументу."),
-        Triple("(?:либо|или)[^.?!]*(?:либо|или)[^.?!]*", "Ложная дилемма", "Точно ли вариантов только два?"),
-        Triple("(?:^|\\s)(?:все|всегда|никогда|каждый|никто)(?=\\s|[,.!?]|$)[^.?!]*", "Поспешное обобщение", "Слишком широкий квантор. Сможете защитить «все», или хватит «многие»?"),
-        Triple("если (?:мы|это)[^.?!]*(?:скоро|рано или поздно|в итоге|а там)[^.?!]*", "Скользкая дорожка", "Каждое звено этой цепочки нуждается в собственном обосновании."),
-    )
-    for ((re, name, note) in tests) {
-        val m = Regex(re, RegexOption.IGNORE_CASE).find(t) ?: continue
-        return Flag(name, m.value.trim().take(90), note)
-    }
-    return null
-}
+data class Flag(val name: String, val quote: String, val note: String, val topic: String? = null)
 
 // ── Prompts ────────────────────────────────────────────────────────────────
 
-const val FALLACIES = "Переход на личности, Соломенное чучело, Ложный след, Апелляция к авторитету, Tu quoque, Ложная дилемма, Предвосхищение основания, Скользкая дорожка, Эквивокация, Поспешное обобщение, Post hoc, Выборочные данные, Нерепрезентативная выборка, Апелляция к эмоциям, Апелляция к большинству, Нагруженная лексика, Апелляция к природе, Ошибка композиции"
 private const val RU = " Пиши ВСЕ текстовые значения на русском языке; ключи JSON оставь на английском."
 
-const val SYS_DRILL = """You write practice exercises for an informal-logic learning app for Russian-speaking learners. Return ONLY a JSON object, no prose, no code fences:
+const val SYS_DRILL = """You write practice exercises for an informal-logic learning app for Russian-speaking learners. The user names ONE fallacy or bias and three distractors. Return ONLY a JSON object, no prose, no code fences:
 {"source": short label such as "Комментарий · городской форум" or "Реклама · доставка еды" (fictional names only),
- "sentences": [3-4 short sentences forming ONE realistic snippet: a social post, ad, op-ed excerpt, group chat or review, set in a Russian-speaking context],
- "flawed": [0-based indices of the sentence(s) containing the flaw],
- "answer": the fallacy's Russian name,
- "options": [exactly 4 Russian fallacy names including the answer, with plausible distractors],
- "explanation": 2 sentences, wry and precise, on why it's that fallacy,
- "whyNot": {each distractor: one sentence on why it doesn't fit}}
-Exactly one fallacy. Make it subtle and realistic, not cartoonish.$RU"""
+ "sentences": [3-4 short sentences forming ONE realistic snippet: a social post, ad, op-ed excerpt, group chat, dialogue or review, set in a Russian-speaking context],
+ "flawed": [0-based indices of the sentence(s) that contain the named flaw],
+ "explanation": 2 sentences, wry and precise, on why this is the named flaw,
+ "whyNot": {"<distractor name exactly as given>": one sentence on why it doesn't fit — one entry for each of the three distractors}}
+The snippet must contain exactly one flaw: the named one. Make it subtle and realistic, not cartoonish.$RU"""
+
+const val SYS_STRUCT = """You write argument-analysis exercises for a logic-learning app for Russian-speaking learners. Return ONLY a JSON object, no prose, no code fences:
+{"source": short label of where the argument comes from (fictional),
+ "sentences": [exactly 3 short sentences forming one everyday argument: one conclusion and two premises, in any order],
+ "conclusion": 0-based index of the conclusion sentence,
+ "premises": [0-based indices of the premise sentences],
+ "assumption": one sentence: the unstated premise the argument needs for the conclusion to follow,
+ "wrong": [two plausible sentences on the same subject that the argument does NOT need],
+ "explanation": 2 sentences: what the conclusion is and why the assumption is needed}$RU"""
+
+const val SYS_QUIZ = """You write deductive-logic puzzles for a logic-learning app for Russian-speaking learners. Return ONLY a JSON object, no prose, no code fences:
+{"source": "Логическая задача",
+ "passage": two premises and a conclusion in plain everyday language,
+ "question": a short question about whether the conclusion follows and whether the argument is sound,
+ "options": [exactly 3 short answers],
+ "answer": 0-based index of the correct option,
+ "explanation": 2 sentences}
+Vary the form: valid and sound, valid with a false premise, affirming the consequent, undistributed middle, modus tollens.$RU"""
 
 const val SYS_AN = """You are an argument analyst in a logic-learning app. Given a passage, extract its structure. Return ONLY a JSON object, no prose, no code fences:
 {"conclusion": string, "premises": [max 4 short paraphrased strings], "assumptions": [max 3 unstated premises the argument needs], "issues": [max 4 {"name": fallacy or weakness name, "quote": EXACT substring copied verbatim from the passage, "note": one or two plain sentences}], "verdict": "Strong" | "Moderate" | "Weak" (keep this value in English), "summary": one sentence}$RU"""
@@ -220,3 +98,6 @@ fun plural(n: Int, one: String, few: String, many: String): String {
     val b = n % 100
     return if (a == 1 && b != 11) one else if (a in 2..4 && (b < 12 || b > 14)) few else many
 }
+
+/** "5 уроков" — the number with its plural form. */
+fun count(n: Int, one: String, few: String, many: String) = "$n ${plural(n, one, few, many)}"

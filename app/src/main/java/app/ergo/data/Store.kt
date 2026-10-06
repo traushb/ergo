@@ -10,8 +10,6 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
-enum class MarkStyle { Pencil, Highlighter }
-
 /**
  * Local persistence. The OpenRouter key is encrypted with an AES key held in the
  * Android Keystore and never leaves the device. Backups are disabled in the manifest.
@@ -38,9 +36,17 @@ class Store(context: Context) {
         get() = prefs.getString("goal", null)
         set(v) = prefs.edit().putString("goal", v).apply()
 
-    var strawDone: Boolean
-        get() = prefs.getBoolean("strawDone", false)
-        set(v) = prefs.edit().putBoolean("strawDone", v).apply()
+    /** Learning progress as JSON (see [Progress]). The first version only knew about the Straw Man lesson. */
+    var progress: Progress
+        get() {
+            val p = Progress.fromJson(prefs.getString("progress", null))
+            return if (prefs.getBoolean("strawDone", false) && "straw_man" !in p.lessons) p.copy(lessons = p.lessons + "straw_man") else p
+        }
+        set(v) = prefs.edit().putString("progress", v.toJson()).remove("strawDone").apply()
+
+    var themeMode: ThemeMode
+        get() = runCatching { ThemeMode.valueOf(prefs.getString("themeMode", null) ?: "") }.getOrDefault(ThemeMode.System)
+        set(v) = prefs.edit().putString("themeMode", v.name).apply()
 
     var markStyle: MarkStyle
         get() = runCatching { MarkStyle.valueOf(prefs.getString("markStyle", null) ?: "") }.getOrDefault(MarkStyle.Pencil)
